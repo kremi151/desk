@@ -1,27 +1,30 @@
 package lu.kremi151.desk.datamodel
 
 import android.graphics.Canvas
+import java.util.*
 
-interface Movable {
+abstract class Movable {
 
-    val width: Float
-    val height: Float
+    internal var id: UUID? = null
 
-    val locked: Boolean = false
+    abstract val width: Float
+    abstract val height: Float
 
-    fun remeasure(desiredWidth: Float, desiredHeight: Float)
+    open val locked: Boolean get() = false
 
-    fun draw(canvas: Canvas)
+    abstract fun remeasure(desiredWidth: Float, desiredHeight: Float)
 
-    fun onMoved(x: Float, y: Float) {
+    abstract fun draw(canvas: Canvas)
+
+    open fun onMoved(x: Float, y: Float) {
         // No-op by default
     }
 
-    fun onFocus() {
+    open fun onFocus() {
         // No-op by default
     }
 
-    fun onBlur() {
+    open fun onBlur() {
         // No-op by default
     }
 
