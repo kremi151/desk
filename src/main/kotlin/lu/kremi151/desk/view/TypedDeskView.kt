@@ -39,7 +39,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
 
     private fun pause() {
         val thread = thread ?: return
-        thread.quitSafely()
+        thread.quit()
         try {
             thread.join()
         } catch (e: InterruptedException) {}

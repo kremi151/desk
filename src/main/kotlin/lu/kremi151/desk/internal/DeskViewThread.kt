@@ -1,50 +1,58 @@
 package lu.kremi151.desk.internal
 
 import android.graphics.Canvas
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.Looper
 import android.view.SurfaceHolder
 import lu.kremi151.desk.datamodel.Movable
+import java.util.concurrent.Semaphore
 
 internal class DeskViewThread<MovableT : Movable>(
     private val surfaceHolder: SurfaceHolder,
     private val movables: MovableCollection<MovableT>,
-): HandlerThread("DeskView handler") {
+): Thread("DeskView thread") {
 
-    private lateinit var mHandler: Handler
+    private var running = true
+    private val s = Semaphore(0)
 
-    override fun onLooperPrepared() {
-        val queue = Looper.myQueue()
-        queue.addIdleHandler {
-            if (surfaceHolder.surface.isValid) {
-                val canvas = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    // TODO: Test it
-                    surfaceHolder.lockHardwareCanvas()
-                } else {
-                    surfaceHolder.lockCanvas()
-                }
-
-                draw(canvas)
-
-                surfaceHolder.unlockCanvasAndPost(canvas)
-            }
-            true
+    private val listener = object : MovableCollection.Listener<MovableT> {
+        override fun onChanged(collection: MovableCollection<MovableT>) {
+            s.release()
         }
-
-        mHandler = Handler(looper)
-        movables.handler = mHandler
-    }
+    };
 
     override fun run() {
-        super.run()
+        movables.addListener(listener)
+        try {
+            while (running) {
+                if (surfaceHolder.surface.isValid) {
+                    val canvas = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        // TODO: Test it
+                        surfaceHolder.lockHardwareCanvas()
+                    } else {
+                        surfaceHolder.lockCanvas()
+                    }
 
-        // Detach handler
-        movables.handler = null
+                    draw(canvas)
+
+                    surfaceHolder.unlockCanvasAndPost(canvas)
+                }
+                s.acquire()
+            }
+        } finally {
+            movables.removeListener(listener)
+        }
     }
 
     private fun draw(canvas: Canvas) {
-        // TODO: Draw
+        movables.forEach {
+            canvas.save()
+            canvas.translate(it.x, it.y)
+            it.movable.draw(canvas)
+            canvas.restore()
+        }
+    }
+
+    fun quit() {
+        running = false
     }
 
 }
