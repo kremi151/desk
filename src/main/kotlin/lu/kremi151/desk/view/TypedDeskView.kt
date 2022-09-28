@@ -5,13 +5,17 @@ import android.util.AttributeSet
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import lu.kremi151.desk.datamodel.Movable
+import lu.kremi151.desk.internal.DeskViewThread
+import lu.kremi151.desk.internal.MovableCollection
 
-class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null
-) : SurfaceView(context, attrs) {
+open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+) : SurfaceView(context, attrs, defStyleAttr) {
 
-    private var running = false
-    private var thread: Thread? = null
+    private var thread: DeskViewThread<MovableT>? = null
+    private val movables = MovableCollection<MovableT>()
 
     private val surfaceHolderCallback = object : SurfaceHolder.Callback2 {
 
@@ -34,35 +38,17 @@ class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
     }
 
     private fun pause() {
-        running = false
+        val thread = thread ?: return
+        thread.quitSafely()
         try {
-            thread?.join()
+            thread.join()
         } catch (e: InterruptedException) {}
+        this.thread = null
     }
 
     private fun resume() {
-        running = true
-        thread = Thread(drawCallback).also {
+        thread = DeskViewThread(holder, movables).also {
             it.start()
-        }
-    }
-
-    private val drawCallback = Runnable {
-        val h = holder
-        while (running) {
-            if (!h.surface.isValid) {
-                continue
-            }
-            val canvas = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                // TODO: Test it
-                h.lockHardwareCanvas()
-            } else {
-                h.lockCanvas()
-            }
-
-            // TODO: Draw
-
-            h.unlockCanvasAndPost(canvas)
         }
     }
 

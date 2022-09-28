@@ -1,9 +1,12 @@
 package lu.kremi151.desk.internal
 
+import android.os.Handler
 import lu.kremi151.desk.datamodel.Movable
 import java.util.*
 
-class MovableCollection<MovableT: Movable> {
+internal class MovableCollection<MovableT: Movable> {
+
+    var handler: Handler? = null
 
     private val movables = mutableListOf<MovableState<MovableT>>()
     private val listeners = mutableListOf<Listener<MovableT>>()
@@ -15,6 +18,18 @@ class MovableCollection<MovableT: Movable> {
         }
         val id = UUID.randomUUID()
         movable.id = id
+        val handler = handler
+        if (handler != null) {
+            handler.post {
+                doAdd(movable)
+            }
+        } else {
+            doAdd(movable)
+        }
+    }
+
+    private fun doAdd(movable: MovableT) {
+        val id = movable.id ?: return
         MovableState(
             movable = movable,
         ).let {
@@ -26,7 +41,18 @@ class MovableCollection<MovableT: Movable> {
         }
     }
 
-    fun remove(movable: MovableT): Boolean {
+    fun remove(movable: MovableT) {
+        val handler = handler
+        if (handler != null) {
+            handler.post {
+                doRemove(movable)
+            }
+        } else {
+            doRemove(movable)
+        }
+    }
+
+    private fun doRemove(movable: MovableT): Boolean {
         val toRemove = movable.id?.let { id ->
             idToState.remove(id)
         } ?: return false
