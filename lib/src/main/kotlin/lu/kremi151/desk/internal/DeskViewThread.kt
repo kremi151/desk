@@ -10,7 +10,9 @@ internal class DeskViewThread<MovableT : Movable>(
     private val movables: MovableCollection<MovableT>,
 ): Thread("DeskView thread") {
 
+    @Volatile
     private var running = true
+
     private val s = Semaphore(0)
 
     private val listener = object : MovableCollection.Listener<MovableT> {
@@ -53,6 +55,7 @@ internal class DeskViewThread<MovableT : Movable>(
 
     fun quit() {
         running = false
+        s.release()
     }
 
 }

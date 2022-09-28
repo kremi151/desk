@@ -37,6 +37,14 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         holder.addCallback(surfaceHolderCallback)
     }
 
+    fun addMovable(movable: MovableT) {
+        movables.add(movable)
+    }
+
+    fun removeMovable(movable: MovableT): Boolean {
+        return movables.remove(movable)
+    }
+
     private fun pause() {
         val thread = thread ?: return
         thread.quit()
