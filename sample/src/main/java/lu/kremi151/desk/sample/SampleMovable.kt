@@ -7,8 +7,12 @@ import lu.kremi151.desk.datamodel.Movable
 
 class SampleMovable: Movable() {
 
-    private val paint = Paint().apply {
+    private val paint1 = Paint().apply {
         color = Color.parseColor("#bada55")
+        style = Paint.Style.FILL
+    }
+    private val paint2 = Paint().apply {
+        color = Color.parseColor("#55daba")
         style = Paint.Style.FILL
     }
 
@@ -23,6 +27,11 @@ class SampleMovable: Movable() {
     }
 
     override fun draw(canvas: Canvas) {
-        canvas.drawRect(0f, 0f, width, height, paint)
+        val hw = width / 2f
+        val hh = height / 2f
+        canvas.drawRect(0f, 0f, hw, hh, paint1)
+        canvas.drawRect(hw, hh, width, height, paint1)
+        canvas.drawRect(hw, 0f, width, hh, paint2)
+        canvas.drawRect(0f, hh, hw, height, paint2)
     }
 }
