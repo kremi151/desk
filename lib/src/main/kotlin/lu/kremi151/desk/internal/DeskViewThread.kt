@@ -19,12 +19,12 @@ internal class DeskViewThread<MovableT : Movable>(
     var backgroundColor: Int = Color.WHITE
         set(value) {
             field = value
-            s.release()
+            invalidate()
         }
 
     private val listener = object : MovableCollection.Listener<MovableT> {
         override fun onChanged(collection: MovableCollection<MovableT>) {
-            s.release()
+            invalidate()
         }
     };
 
@@ -64,6 +64,10 @@ internal class DeskViewThread<MovableT : Movable>(
 
     fun quit() {
         running = false
+        invalidate()
+    }
+
+    fun invalidate() {
         s.release()
     }
 

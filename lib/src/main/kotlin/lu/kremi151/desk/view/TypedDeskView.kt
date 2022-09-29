@@ -37,6 +37,11 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         holder.addCallback(surfaceHolderCallback)
     }
 
+    override fun invalidate() {
+        super.invalidate()
+        thread?.invalidate()
+    }
+
     fun addMovable(movable: MovableT) {
         movables.add(movable)
     }
