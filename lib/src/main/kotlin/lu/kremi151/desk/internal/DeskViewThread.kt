@@ -68,7 +68,7 @@ internal class DeskViewThread<MovableT : Movable>(
         movables.forEach {
             canvas.save()
             canvas.translate(it.x, it.y)
-            it.movable.draw(canvas)
+            it.draw(canvas)
             canvas.restore()
         }
     }

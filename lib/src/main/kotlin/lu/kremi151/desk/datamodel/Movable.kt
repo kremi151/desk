@@ -7,6 +7,11 @@ abstract class Movable {
 
     internal var id: UUID? = null
 
+    var x: Float = 0.0f
+        internal set
+    var y: Float = 0.0f
+        internal set
+
     abstract val width: Float
     abstract val height: Float
 

@@ -10,7 +10,6 @@ import lu.kremi151.desk.R
 import lu.kremi151.desk.datamodel.Movable
 import lu.kremi151.desk.internal.DeskViewThread
 import lu.kremi151.desk.internal.MovableCollection
-import lu.kremi151.desk.internal.MovableState
 
 open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
     context: Context,
@@ -55,10 +54,12 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
 
     private var mPosX: Float = 0f
     private var mPosY: Float = 0f
+    private var mInitialPosX: Float = 0f
+    private var mInitialPosY: Float = 0f
     private var mLastTouchX: Float = 0f
     private var mLastTouchY: Float = 0f
     private var mActivePointerId: Int = MotionEvent.INVALID_POINTER_ID
-    private var mActiveMovable: MovableState<MovableT>? = null
+    private var mActiveMovable: MovableT? = null
 
     final override fun setBackgroundColor(color: Int) {
         mBackgroundColor = color
@@ -89,11 +90,13 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
                     mActiveMovable = movables.findFirstState { m ->
                         m.x <= mLastTouchX
                                 && m.y <= mLastTouchY
-                                && m.x + m.movable.width >= mLastTouchX
-                                && m.y + m.movable.height >= mLastTouchY
+                                && m.x + m.width >= mLastTouchX
+                                && m.y + m.height >= mLastTouchY
                     }?.also { m ->
                         mPosX = m.x
                         mPosY = m.y
+                        mInitialPosX = m.x
+                        mInitialPosY = m.y
                     }
                 }
 
@@ -125,6 +128,10 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 mActivePointerId = MotionEvent.INVALID_POINTER_ID
+                val activeMovable = mActiveMovable
+                if (activeMovable != null && (mInitialPosX != mPosX || mInitialPosY != mPosY)) {
+                    activeMovable.onMoved(mPosX, mPosY)
+                }
             }
             MotionEvent.ACTION_POINTER_UP -> {
                 event.actionIndex.also { pointerIndex ->

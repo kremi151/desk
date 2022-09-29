@@ -5,9 +5,9 @@ import java.util.*
 
 internal class MovableCollection<MovableT: Movable> {
 
-    private val movables = mutableListOf<MovableState<MovableT>>()
+    private val movables = mutableListOf<MovableT>()
     private val listeners = mutableListOf<Listener<MovableT>>()
-    private val idToState = mutableMapOf<UUID, MovableState<MovableT>>()
+    private val idToState = mutableMapOf<UUID, MovableT>()
 
     fun add(movable: MovableT) {
         if (movable.id != null) {
@@ -15,12 +15,8 @@ internal class MovableCollection<MovableT: Movable> {
         }
         val id = UUID.randomUUID()
         synchronized(movables) {
-            MovableState(
-                movable = movable,
-            ).let {
-                movables.add(it)
-                idToState[id] = it
-            }
+            movables.add(movable)
+            idToState[id] = movable
         }
         synchronized(listeners) {
             listeners.forEach {
@@ -46,13 +42,13 @@ internal class MovableCollection<MovableT: Movable> {
         return removed
     }
 
-    fun forEach(action: (MovableState<MovableT>) -> Unit) {
+    fun forEach(action: (MovableT) -> Unit) {
         synchronized(movables) {
             movables.forEach(action)
         }
     }
 
-    fun findFirstState(predicate: (MovableState<MovableT>) -> Boolean): MovableState<MovableT>? {
+    fun findFirstState(predicate: (MovableT) -> Boolean): MovableT? {
         synchronized(movables) {
             return movables.firstOrNull(predicate)
         }
