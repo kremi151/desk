@@ -2,13 +2,17 @@ package lu.kremi151.desk.internal
 
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
 import android.view.SurfaceHolder
+import lu.kremi151.desk.BuildConfig
 import lu.kremi151.desk.datamodel.Movable
 import java.util.concurrent.Semaphore
 
 internal class DeskViewThread<MovableT : Movable>(
     private val surfaceHolder: SurfaceHolder,
     private val movables: MovableCollection<MovableT>,
+    backgroundColor: Int,
+    debugMode: Boolean,
 ): Thread("DeskView thread") {
 
     @Volatile
@@ -16,7 +20,13 @@ internal class DeskViewThread<MovableT : Movable>(
 
     private val s = Semaphore(0)
 
-    var backgroundColor: Int = Color.WHITE
+    var backgroundColor: Int = backgroundColor
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    var debugMode: Boolean = debugMode
         set(value) {
             field = value
             invalidate()
@@ -43,6 +53,7 @@ internal class DeskViewThread<MovableT : Movable>(
                     canvas.drawColor(backgroundColor)
 
                     draw(canvas)
+                    postDraw(canvas)
 
                     surfaceHolder.unlockCanvasAndPost(canvas)
                 }
@@ -59,6 +70,17 @@ internal class DeskViewThread<MovableT : Movable>(
             canvas.translate(it.x, it.y)
             it.movable.draw(canvas)
             canvas.restore()
+        }
+    }
+
+    private fun postDraw(canvas: Canvas) {
+        if (BuildConfig.DEBUG && debugMode) {
+            val paint = Paint().apply {
+                color = Color.BLACK
+                textSize = 28.0f
+            }
+            val text = "Last re-draw: ${System.currentTimeMillis()}"
+            canvas.drawText(text, 0f, canvas.height.toFloat() - 28.0f, paint)
         }
     }
 

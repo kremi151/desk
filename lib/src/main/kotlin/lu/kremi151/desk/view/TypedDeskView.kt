@@ -1,9 +1,11 @@
 package lu.kremi151.desk.view
 
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import lu.kremi151.desk.R
 import lu.kremi151.desk.datamodel.Movable
 import lu.kremi151.desk.internal.DeskViewThread
 import lu.kremi151.desk.internal.MovableCollection
@@ -37,8 +39,30 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
 
     }
 
+    var debugMode: Boolean = false
+        set(value) {
+            field = value
+            thread?.debugMode = value
+        }
+
+    private var mBackgroundColor: Int = Color.WHITE
+        set(value) {
+            field = value
+            thread?.backgroundColor = value
+        }
+
+    final override fun setBackgroundColor(color: Int) {
+        mBackgroundColor = color
+    }
+
     init {
         holder.addCallback(surfaceHolderCallback)
+
+        val typedArray = context.obtainStyledAttributes(
+            attrs, R.styleable.TypedDeskView, defStyleAttr, R.style.DeskView)
+        debugMode = typedArray.getBoolean(R.styleable.TypedDeskView_deskView_debugMode, false)
+        setBackgroundColor(typedArray.getColor(R.styleable.TypedDeskView_deskView_backgroundColor, Color.WHITE))
+        typedArray.recycle()
     }
 
     override fun invalidate() {
@@ -64,7 +88,12 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
     }
 
     private fun resume() {
-        thread = DeskViewThread(holder, movables).also {
+        thread = DeskViewThread(
+            surfaceHolder = holder,
+            movables = movables,
+            backgroundColor = mBackgroundColor,
+            debugMode = debugMode,
+        ).also {
             it.start()
         }
     }
