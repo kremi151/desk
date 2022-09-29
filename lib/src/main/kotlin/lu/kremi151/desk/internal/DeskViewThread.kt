@@ -1,6 +1,7 @@
 package lu.kremi151.desk.internal
 
 import android.graphics.Canvas
+import android.graphics.Color
 import android.view.SurfaceHolder
 import lu.kremi151.desk.datamodel.Movable
 import java.util.concurrent.Semaphore
@@ -14,6 +15,12 @@ internal class DeskViewThread<MovableT : Movable>(
     private var running = true
 
     private val s = Semaphore(0)
+
+    var backgroundColor: Int = Color.WHITE
+        set(value) {
+            field = value
+            s.release()
+        }
 
     private val listener = object : MovableCollection.Listener<MovableT> {
         override fun onChanged(collection: MovableCollection<MovableT>) {
@@ -32,6 +39,8 @@ internal class DeskViewThread<MovableT : Movable>(
                     } else {
                         surfaceHolder.lockCanvas()
                     }
+
+                    canvas.drawColor(backgroundColor)
 
                     draw(canvas)
 
