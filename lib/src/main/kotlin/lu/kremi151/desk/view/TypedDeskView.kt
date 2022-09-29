@@ -23,13 +23,17 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
             resume()
         }
 
-        override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {}
+        override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+            invalidate()
+        }
 
         override fun surfaceDestroyed(holder: SurfaceHolder) {
             pause()
         }
 
-        override fun surfaceRedrawNeeded(holder: SurfaceHolder) {}
+        override fun surfaceRedrawNeeded(holder: SurfaceHolder) {
+            invalidate()
+        }
 
     }
 
