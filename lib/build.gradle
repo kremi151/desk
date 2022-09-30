@@ -49,5 +49,29 @@ publishing {
     }
 }
 
+def detektTask = tasks.named("detekt")
+detektTask.configure {
+    reports {
+        xml {
+            enabled = true
+        }
+    }
+}
+
+tasks.register("detekt2Junit") {
+    def inXslt = "$rootDir/xslt/checkstyle2junit.xslt" // comes from https://github.com/koalaman/shellcheck/wiki/JUnit
+    def inXml = "${project.buildDir}/reports/detekt/detekt.xml"
+    def out = "${project.buildDir}/reports/detekt/junit.xml"
+
+    description "Converts Checkstyle from Detekt to junit"
+    group "verification"
+    inputs.files inXslt, inXml
+    outputs.files out
+    doLast {
+        ant.xslt(in: inXml, out: out, style: inXslt)
+        logger.info("Wrote junit detekt file out to $out")
+    }
+}
+
 dependencies {
 }

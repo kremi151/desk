@@ -20,6 +20,15 @@ jobs:
         run: ./gradlew :lib:assembleRelease -x test
       - name: Detekt
         run: ./gradlew detekt
+      - name: Convert detekt report to JUnit format
+        run: ./gradlew detekt2Junit
+        if: always()
+      - name: Report detekt findings in JUnit format
+        uses: ashley-taylor/junit-report-annotations-action@master
+        with:
+          access-token: ${{ secrets.GITHUB_TOKEN }}
+          path: "${{ github.workspace }}/lib/build/reports/detekt/junit.xml"
+        if: always()
 #      - name: Test
 #        run: ./gradlew testReleaseUnitTest
 #      - name: Report test results
