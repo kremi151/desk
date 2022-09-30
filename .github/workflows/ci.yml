@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: kremi151/android-ndk:android-31-jdk11
+    steps:
+      - name: Pre-checkout
+        run: apk add git
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build
+        run: ./gradlew :lib:assembleRelease -x test
+#      - name: Detekt
+#        run: ./gradlew detekt
+#      - name: Test
+#        run: ./gradlew testReleaseUnitTest
+#      - name: Report test results
+#        uses: ashley-taylor/junit-report-annotations-action@master
+#        with:
+#          access-token: ${{ secrets.GITHUB_TOKEN }}
+#          path: "${{ github.workspace }}/app/build/test-results/**/*.xml"
+#        if: always()
+      - name: Publish Maven artifact
+        run: ./gradlew :lib:publish
+        env:
+          ORG_GRADLE_PROJECT_githubPackagesUsername: kremi151
+          ORG_GRADLE_PROJECT_githubPackagesPassword: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ github.event_name != 'pull_request' }}
