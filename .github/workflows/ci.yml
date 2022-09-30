@@ -34,3 +34,9 @@ jobs:
           ORG_GRADLE_PROJECT_githubPackagesUsername: kremi151
           ORG_GRADLE_PROJECT_githubPackagesPassword: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ github.event_name != 'pull_request' }}
+      - name: Cleanup old snapshot versions
+        uses: actions/delete-package-versions@v3
+        with:
+          min-versions-to-keep: 10
+          delete-only-pre-release-versions: "true"
+        if: ${{ github.event_name != 'pull_request' }}
