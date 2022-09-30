@@ -16,14 +16,15 @@ class SampleMovable: Movable() {
         style = Paint.Style.FILL
     }
 
-    override val width: Float
-        get() = 200.0f
+    override var width: Float = 400.0f
+        private set
 
-    override val height: Float
-        get() = 200.0f
+    override var height: Float = 400.0f
+        private set
 
     override fun remeasure(desiredWidth: Float, desiredHeight: Float) {
-        // TODO: Dynamic sizing
+        width = desiredWidth
+        height = desiredHeight
     }
 
     override fun draw(canvas: Canvas) {

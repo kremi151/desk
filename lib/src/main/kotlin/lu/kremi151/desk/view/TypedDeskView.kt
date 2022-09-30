@@ -1,15 +1,19 @@
 package lu.kremi151.desk.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
 import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import lu.kremi151.desk.R
 import lu.kremi151.desk.datamodel.Movable
 import lu.kremi151.desk.internal.DeskViewThread
 import lu.kremi151.desk.internal.MovableCollection
+import kotlin.math.max
+import kotlin.math.min
 
 open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
     context: Context,
@@ -80,19 +84,53 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         thread?.invalidate()
     }
 
+    private fun findMovableByPos(x: Float, y: Float): MovableT? = movables.findFirstState { m ->
+        m.x <= x && m.y <= y && m.x + m.width >= x && m.y + m.height >= y
+    }
+
+    private val scaleListener = object : ScaleGestureDetector.OnScaleGestureListener {
+        override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
+            val movable = findMovableByPos(detector.focusX, detector.focusY)
+            mActiveMovable = movable
+            return movable != null
+        }
+
+        override fun onScale(detector: ScaleGestureDetector): Boolean {
+            val scaleFactor = max(0.1f, min(5.0f, detector.scaleFactor))
+            mActiveMovable?.let {
+                val oldWidth = it.width
+                val oldHeight = it.height
+                val newWidth = oldWidth * scaleFactor
+                val newHeight = oldHeight * scaleFactor
+                it.remeasure(newWidth, newHeight)
+                it.x += (oldWidth - newWidth) / 2f
+                it.y += (oldHeight - newHeight) / 2f
+                invalidate()
+            }
+
+            return true
+        }
+
+        override fun onScaleEnd(detector: ScaleGestureDetector?) {
+            mActiveMovable = null
+        }
+    }
+    private val mScaleDetector = ScaleGestureDetector(context, scaleListener)
+
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        mScaleDetector.onTouchEvent(event)
+        if (mScaleDetector.isInProgress) {
+            return true
+        }
+
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 event.actionIndex.also { pointerIndex ->
                     // Remember where we started (for dragging)
                     mLastTouchX = event.getX(pointerIndex)
                     mLastTouchY = event.getY(pointerIndex)
-                    mActiveMovable = movables.findFirstState { m ->
-                        m.x <= mLastTouchX
-                                && m.y <= mLastTouchY
-                                && m.x + m.width >= mLastTouchX
-                                && m.y + m.height >= mLastTouchY
-                    }?.also { m ->
+                    mActiveMovable = findMovableByPos(mLastTouchX, mLastTouchY)?.also { m ->
                         mPosX = m.x
                         mPosY = m.y
                         mInitialPosX = m.x
