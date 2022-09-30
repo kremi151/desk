@@ -5,14 +5,14 @@ import android.graphics.Color
 import android.graphics.Paint
 import lu.kremi151.desk.datamodel.Movable
 
-class SampleMovable: Movable() {
+class SampleMovable(color1: Int, color2: Int): Movable() {
 
     private val paint1 = Paint().apply {
-        color = Color.parseColor("#bada55")
+        color = color1
         style = Paint.Style.FILL
     }
     private val paint2 = Paint().apply {
-        color = Color.parseColor("#55daba")
+        color = color2
         style = Paint.Style.FILL
     }
 

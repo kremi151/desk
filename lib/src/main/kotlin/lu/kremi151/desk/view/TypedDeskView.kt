@@ -189,8 +189,11 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         return true
     }
 
-    fun addMovable(movable: MovableT) {
-        movables.add(movable)
+    fun addMovable(movable: MovableT, x: Float = 0.0f, y: Float = 0.0f) {
+        movables.add(movable.apply {
+            this.x = x
+            this.y = y
+        })
     }
 
     fun removeMovable(movable: MovableT): Boolean {
