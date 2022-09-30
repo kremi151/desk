@@ -1,17 +1,17 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'maven-publish'
 }
 
 android {
     compileSdk 31
 
     defaultConfig {
-        //applicationId "lu.kremi151.desk"
         minSdk 23
         targetSdk 31
-        versionCode 1
-        versionName "1.0"
+        versionCode rootProject.versionCode
+        versionName rootProject.versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -22,6 +22,29 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+    }
+}
+
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId = 'lu.kremi151'
+            artifactId = 'desk'
+            version = rootProject.isRelease
+                ? rootProject.versionName
+                : "${rootProject.versionName}-SNAPSHOT"
+
+            afterEvaluate {
+                from components.release
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = 'githubPackages'
+            url = "https://maven.pkg.github.com/kremi151/desk"
+            credentials(PasswordCredentials)
+        }
     }
 }
 

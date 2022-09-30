@@ -4,5 +4,11 @@ plugins {
     id 'org.jetbrains.kotlin.android' version '1.6.10' apply false
 }
 
+ext {
+    versionCode = 1
+    versionName = "0.0.1"
+    isRelease = "true" == project.findProperty('isRelease')
+}
+
 dependencies {
 }
