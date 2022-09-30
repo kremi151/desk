@@ -10,9 +10,7 @@ internal class MovableCollection<MovableT: Movable> {
     private val idToState = mutableMapOf<UUID, MovableT>()
 
     fun add(movable: MovableT) {
-        if (movable.id != null) {
-            throw IllegalStateException("Movable is already bound to a DeskView")
-        }
+        check(movable.id == null) { "Movable is already bound to a DeskView" }
         val id = UUID.randomUUID()
         synchronized(movables) {
             movables.add(movable)

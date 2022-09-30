@@ -21,6 +21,11 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : SurfaceView(context, attrs, defStyleAttr) {
 
+    companion object {
+        private const val SCALE_FACTOR_MINIMUM = 0.1f
+        private const val SCALE_FACTOR_MAXIMUM = 5.0f
+    }
+
     private var thread: DeskViewThread<MovableT>? = null
     private val movables = MovableCollection<MovableT>()
 
@@ -103,7 +108,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         }
 
         override fun onScale(detector: ScaleGestureDetector): Boolean {
-            val scaleFactor = max(0.1f, min(5.0f, detector.scaleFactor))
+            val scaleFactor = max(SCALE_FACTOR_MINIMUM, min(SCALE_FACTOR_MAXIMUM, detector.scaleFactor))
             mActiveMovable?.let {
                 val oldWidth = it.width
                 val oldHeight = it.height
@@ -125,6 +130,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
     private val mScaleDetector = ScaleGestureDetector(context, scaleListener)
 
     @SuppressLint("ClickableViewAccessibility")
+    @Suppress("ComplexMethod")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         mScaleDetector.onTouchEvent(event)
         if (mScaleDetector.isInProgress) {
@@ -212,7 +218,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         thread.quit()
         try {
             thread.join()
-        } catch (e: InterruptedException) {}
+        } catch (ignore: InterruptedException) {}
         this.thread = null
     }
 

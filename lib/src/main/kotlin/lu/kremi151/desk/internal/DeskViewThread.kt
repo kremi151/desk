@@ -16,6 +16,10 @@ internal class DeskViewThread<MovableT : Movable>(
     hardwareAccelerated: Boolean,
 ): Thread("DeskView thread") {
 
+    companion object {
+        private const val DEBUG_PAINT_FONT_SIZE = 28.0f
+    }
+
     @Volatile
     private var running = true
 
@@ -50,26 +54,30 @@ internal class DeskViewThread<MovableT : Movable>(
         try {
             while (running) {
                 if (surfaceHolder.surface.isValid) {
-                    val canvas = if (hardwareAccelerated
-                        && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                        // TODO: Test it
-                        surfaceHolder.lockHardwareCanvas()
-                    } else {
-                        surfaceHolder.lockCanvas()
-                    }
-
-                    canvas.drawColor(backgroundColor)
-
-                    draw(canvas)
-                    postDraw(canvas)
-
-                    surfaceHolder.unlockCanvasAndPost(canvas)
+                    acquireAndDrawCanvas()
                 }
                 s.acquire()
             }
         } finally {
             movables.removeListener(listener)
         }
+    }
+
+    private fun acquireAndDrawCanvas() {
+        val canvas = if (hardwareAccelerated
+            && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            // TODO: Test it
+            surfaceHolder.lockHardwareCanvas()
+        } else {
+            surfaceHolder.lockCanvas()
+        }
+
+        canvas.drawColor(backgroundColor)
+
+        draw(canvas)
+        postDraw(canvas)
+
+        surfaceHolder.unlockCanvasAndPost(canvas)
     }
 
     private fun draw(canvas: Canvas) {
@@ -85,10 +93,10 @@ internal class DeskViewThread<MovableT : Movable>(
         if (BuildConfig.DEBUG && debugMode) {
             val paint = Paint().apply {
                 color = Color.BLACK
-                textSize = 28.0f
+                textSize = DEBUG_PAINT_FONT_SIZE
             }
             val text = "Last re-draw: ${System.currentTimeMillis()}"
-            canvas.drawText(text, 0f, canvas.height.toFloat() - 28.0f, paint)
+            canvas.drawText(text, 0f, canvas.height.toFloat() - DEBUG_PAINT_FONT_SIZE, paint)
         }
     }
 

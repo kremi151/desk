@@ -18,8 +18,8 @@ jobs:
         uses: actions/checkout@v2
       - name: Build
         run: ./gradlew :lib:assembleRelease -x test
-#      - name: Detekt
-#        run: ./gradlew detekt
+      - name: Detekt
+        run: ./gradlew detekt
 #      - name: Test
 #        run: ./gradlew testReleaseUnitTest
 #      - name: Report test results
