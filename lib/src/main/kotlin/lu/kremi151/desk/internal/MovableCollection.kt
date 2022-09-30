@@ -48,6 +48,15 @@ internal class MovableCollection<MovableT: Movable> {
         }
     }
 
+    fun forEachReversed(action: (MovableT) -> Unit) {
+        synchronized(movables) {
+            val size = movables.size
+            for (i in size-1 downTo 0) {
+                action(movables[i])
+            }
+        }
+    }
+
     fun findFirstState(predicate: (MovableT) -> Boolean): MovableT? {
         synchronized(movables) {
             return movables.firstOrNull(predicate)
