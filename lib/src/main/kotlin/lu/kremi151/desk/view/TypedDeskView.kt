@@ -50,6 +50,12 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
             thread?.debugMode = value
         }
 
+    var hardwareAccelerated: Boolean = false
+        set(value) {
+            field = value
+            thread?.hardwareAccelerated = value
+        }
+
     private var mBackgroundColor: Int = Color.WHITE
         set(value) {
             field = value
@@ -75,6 +81,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         val typedArray = context.obtainStyledAttributes(
             attrs, R.styleable.TypedDeskView, defStyleAttr, R.style.DeskView)
         debugMode = typedArray.getBoolean(R.styleable.TypedDeskView_deskView_debugMode, false)
+        hardwareAccelerated = typedArray.getBoolean(R.styleable.TypedDeskView_deskView_hardwareAccelerated, false)
         setBackgroundColor(typedArray.getColor(R.styleable.TypedDeskView_deskView_backgroundColor, Color.WHITE))
         typedArray.recycle()
     }
@@ -215,6 +222,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
             movables = movables,
             backgroundColor = mBackgroundColor,
             debugMode = debugMode,
+            hardwareAccelerated = hardwareAccelerated,
         ).also {
             it.start()
         }

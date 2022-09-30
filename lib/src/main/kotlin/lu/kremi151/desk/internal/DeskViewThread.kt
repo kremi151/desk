@@ -13,6 +13,7 @@ internal class DeskViewThread<MovableT : Movable>(
     private val movables: MovableCollection<MovableT>,
     backgroundColor: Int,
     debugMode: Boolean,
+    hardwareAccelerated: Boolean,
 ): Thread("DeskView thread") {
 
     @Volatile
@@ -32,6 +33,12 @@ internal class DeskViewThread<MovableT : Movable>(
             invalidate()
         }
 
+    var hardwareAccelerated: Boolean = hardwareAccelerated
+        set(value) {
+            field = value
+            invalidate()
+        }
+
     private val listener = object : MovableCollection.Listener<MovableT> {
         override fun onChanged(collection: MovableCollection<MovableT>) {
             invalidate()
@@ -43,7 +50,8 @@ internal class DeskViewThread<MovableT : Movable>(
         try {
             while (running) {
                 if (surfaceHolder.surface.isValid) {
-                    val canvas = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    val canvas = if (hardwareAccelerated
+                        && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                         // TODO: Test it
                         surfaceHolder.lockHardwareCanvas()
                     } else {

@@ -3,6 +3,7 @@
     <attr name="deskView_style" format="reference"/>
     <declare-styleable name="TypedDeskView">
         <attr name="deskView_debugMode" format="boolean"/>
+        <attr name="deskView_hardwareAccelerated" format="boolean"/>
         <attr name="deskView_backgroundColor" format="color"/>
     </declare-styleable>
 </resources>
