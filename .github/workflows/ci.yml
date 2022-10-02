@@ -21,7 +21,9 @@ jobs:
       - name: Detekt
         run: ./gradlew detekt
       - name: Convert detekt report to JUnit format
-        run: ./gradlew detekt2Junit
+        run: |
+          ./gradlew detekt2Junit
+          sed -i 's#/__w/desk/desk/##' "${{ github.workspace }}/lib/build/reports/detekt/junit.xml"
         if: always()
       - name: Report detekt findings in JUnit format
         uses: ashley-taylor/junit-report-annotations-action@master
