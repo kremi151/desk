@@ -11,9 +11,7 @@ import java.util.concurrent.Semaphore
 internal class DeskViewThread<MovableT : Movable>(
     private val surfaceHolder: SurfaceHolder,
     private val movables: MovableCollection<MovableT>,
-    backgroundColor: Int,
-    debugMode: Boolean,
-    hardwareAccelerated: Boolean,
+    config: DeskViewConfig,
 ): Thread("DeskView thread") {
 
     companion object {
@@ -25,19 +23,7 @@ internal class DeskViewThread<MovableT : Movable>(
 
     private val s = Semaphore(0)
 
-    var backgroundColor: Int = backgroundColor
-        set(value) {
-            field = value
-            invalidate()
-        }
-
-    var debugMode: Boolean = debugMode
-        set(value) {
-            field = value
-            invalidate()
-        }
-
-    var hardwareAccelerated: Boolean = hardwareAccelerated
+    var config: DeskViewConfig = config
         set(value) {
             field = value
             invalidate()
@@ -64,7 +50,8 @@ internal class DeskViewThread<MovableT : Movable>(
     }
 
     private fun acquireAndDrawCanvas() {
-        val canvas = if (hardwareAccelerated
+        val config = config
+        val canvas = if (config.hardwareAccelerated
             && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             // TODO: Test it
             surfaceHolder.lockHardwareCanvas()
@@ -72,7 +59,7 @@ internal class DeskViewThread<MovableT : Movable>(
             surfaceHolder.lockCanvas()
         }
 
-        canvas.drawColor(backgroundColor)
+        canvas.drawColor(config.backgroundColor)
 
         draw(canvas)
         postDraw(canvas)
@@ -90,7 +77,7 @@ internal class DeskViewThread<MovableT : Movable>(
     }
 
     private fun postDraw(canvas: Canvas) {
-        if (BuildConfig.DEBUG && debugMode) {
+        if (BuildConfig.DEBUG && config.debugMode) {
             val paint = Paint().apply {
                 color = Color.BLACK
                 textSize = DEBUG_PAINT_FONT_SIZE

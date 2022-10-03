@@ -10,6 +10,7 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import lu.kremi151.desk.R
 import lu.kremi151.desk.datamodel.Movable
+import lu.kremi151.desk.internal.DeskViewConfig
 import lu.kremi151.desk.internal.DeskViewThread
 import lu.kremi151.desk.internal.MovableCollection
 import kotlin.math.max
@@ -49,22 +50,10 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
 
     }
 
-    var debugMode: Boolean = false
+    var config: DeskViewConfig = DeskViewConfig()
         set(value) {
             field = value
-            thread?.debugMode = value
-        }
-
-    var hardwareAccelerated: Boolean = false
-        set(value) {
-            field = value
-            thread?.hardwareAccelerated = value
-        }
-
-    private var mBackgroundColor: Int = Color.WHITE
-        set(value) {
-            field = value
-            thread?.backgroundColor = value
+            thread?.config = value
         }
 
     private var mPosX: Float = 0f
@@ -77,7 +66,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
     private var mActiveMovable: MovableT? = null
 
     final override fun setBackgroundColor(color: Int) {
-        mBackgroundColor = color
+        config = config.copy(backgroundColor = color)
     }
 
     init {
@@ -85,9 +74,13 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
 
         val typedArray = context.obtainStyledAttributes(
             attrs, R.styleable.TypedDeskView, defStyleAttr, R.style.DeskView)
-        debugMode = typedArray.getBoolean(R.styleable.TypedDeskView_deskView_debugMode, false)
-        hardwareAccelerated = typedArray.getBoolean(R.styleable.TypedDeskView_deskView_hardwareAccelerated, false)
-        setBackgroundColor(typedArray.getColor(R.styleable.TypedDeskView_deskView_backgroundColor, Color.WHITE))
+
+        val config = DeskViewConfig(
+            debugMode = typedArray.getBoolean(R.styleable.TypedDeskView_deskView_debugMode, false),
+            hardwareAccelerated = typedArray.getBoolean(R.styleable.TypedDeskView_deskView_hardwareAccelerated, false),
+            backgroundColor = typedArray.getColor(R.styleable.TypedDeskView_deskView_backgroundColor, Color.WHITE),
+        )
+        this.config = config
         typedArray.recycle()
     }
 
@@ -226,9 +219,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         thread = DeskViewThread(
             surfaceHolder = holder,
             movables = movables,
-            backgroundColor = mBackgroundColor,
-            debugMode = debugMode,
-            hardwareAccelerated = hardwareAccelerated,
+            config = config,
         ).also {
             it.start()
         }
