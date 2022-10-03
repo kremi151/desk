@@ -20,16 +20,10 @@ jobs:
         run: ./gradlew :lib:assembleRelease -x test
       - name: Detekt
         run: ./gradlew detekt
-      - name: Convert detekt report to JUnit format
-        run: |
-          ./gradlew detekt2Junit
-          sed -i "s:${GITHUB_WORKSPACE}/::g" "${GITHUB_WORKSPACE}/lib/build/reports/detekt/junit.xml"
-        if: always()
-      - name: Report detekt findings in JUnit format
-        uses: ashley-taylor/junit-report-annotations-action@master
+      - name: Report detekt findings
+        uses: jwgmeligmeyling/checkstyle-github-action@v1.2
         with:
-          access-token: ${{ secrets.GITHUB_TOKEN }}
-          path: "${{ github.workspace }}/lib/build/reports/detekt/junit.xml"
+          path: '${{ github.workspace }}/lib/build/reports/detekt/detekt.xml'
         if: always()
 #      - name: Test
 #        run: ./gradlew testReleaseUnitTest
