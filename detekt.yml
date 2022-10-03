@@ -1,0 +1,5 @@
+style:
+  ForbiddenComment:
+    active: true
+    values: ['TODO:', 'FIXME:']
+    allowedPatterns: '(TODO|FIXME):\s.*?\s\(#\d+\)'

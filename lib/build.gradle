@@ -51,6 +51,11 @@ publishing {
 
 def detektTask = tasks.named("detekt")
 detektTask.configure {
+    config.setFrom(files(rootProject.file('detekt.yml')))
+
+    // Apply defaults and override them using config file
+    buildUponDefaultConfig = true
+
     reports {
         xml {
             enabled = true

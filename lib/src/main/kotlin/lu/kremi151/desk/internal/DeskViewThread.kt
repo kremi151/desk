@@ -53,7 +53,7 @@ internal class DeskViewThread<MovableT : Movable>(
         val config = config
         val canvas = if (config.hardwareAccelerated
             && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            // TODO: Test it
+            // TODO: Test it (#1)
             surfaceHolder.lockHardwareCanvas()
         } else {
             surfaceHolder.lockCanvas()
