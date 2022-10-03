@@ -55,9 +55,15 @@ internal class MovableCollection<MovableT: Movable> {
         }
     }
 
-    fun findFirstState(predicate: (MovableT) -> Boolean): MovableT? {
+    fun findFirst(predicate: (MovableT) -> Boolean): MovableT? {
         synchronized(movables) {
             return movables.firstOrNull(predicate)
+        }
+    }
+
+    fun findLast(predicate: (MovableT) -> Boolean): MovableT? {
+        synchronized(movables) {
+            return movables.lastOrNull(predicate)
         }
     }
 

@@ -91,7 +91,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         thread?.invalidate()
     }
 
-    private fun findMovableByPos(x: Float, y: Float): MovableT? = movables.findFirstState { m ->
+    private fun findMovableByPos(x: Float, y: Float): MovableT? = movables.findLast { m ->
         m.x <= x && m.y <= y && m.x + m.width >= x && m.y + m.height >= y
     }
 

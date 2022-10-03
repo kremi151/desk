@@ -68,7 +68,7 @@ internal class DeskViewThread<MovableT : Movable>(
     }
 
     private fun draw(canvas: Canvas) {
-        movables.forEachReversed {
+        movables.forEach {
             canvas.save()
             canvas.translate(it.x, it.y)
             it.draw(canvas)
