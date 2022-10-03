@@ -6,4 +6,5 @@ data class DeskViewConfig(
     val backgroundColor: Int = Color.WHITE,
     val debugMode: Boolean = false,
     val hardwareAccelerated: Boolean = false,
+    val containMovables: Boolean = false,
 )

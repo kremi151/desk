@@ -56,14 +56,15 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
             thread?.config = value
         }
 
-    private var mPosX: Float = 0f
-    private var mPosY: Float = 0f
     private var mInitialPosX: Float = 0f
     private var mInitialPosY: Float = 0f
     private var mLastTouchX: Float = 0f
     private var mLastTouchY: Float = 0f
     private var mActivePointerId: Int = MotionEvent.INVALID_POINTER_ID
     private var mActiveMovable: MovableT? = null
+
+    private var mWidth: Int = 0
+    private var mHeight: Int = 0
 
     final override fun setBackgroundColor(color: Int) {
         config = config.copy(backgroundColor = color)
@@ -78,6 +79,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         val config = DeskViewConfig(
             debugMode = typedArray.getBoolean(R.styleable.TypedDeskView_deskView_debugMode, false),
             hardwareAccelerated = typedArray.getBoolean(R.styleable.TypedDeskView_deskView_hardwareAccelerated, false),
+            containMovables = typedArray.getBoolean(R.styleable.TypedDeskView_deskView_containMovables, false),
             backgroundColor = typedArray.getColor(R.styleable.TypedDeskView_deskView_backgroundColor, Color.WHITE),
         )
         this.config = config
@@ -137,8 +139,6 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
                     mLastTouchX = event.getX(pointerIndex)
                     mLastTouchY = event.getY(pointerIndex)
                     mActiveMovable = findMovableByPos(mLastTouchX, mLastTouchY)?.also { m ->
-                        mPosX = m.x
-                        mPosY = m.y
                         mInitialPosX = m.x
                         mInitialPosY = m.y
                     }
@@ -156,15 +156,18 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
                         event.getX(pointerIndex) to event.getY(pointerIndex)
                     }
 
-                mPosX += x - mLastTouchX
-                mPosY += y - mLastTouchY
-
                 mActiveMovable?.let {
-                    it.x = mPosX
-                    it.y = mPosY
-                }
+                    val newX = it.x + x - mLastTouchX
+                    val newY = it.y + y - mLastTouchY
 
-                invalidate()
+                    if (config.containMovables) {
+                        moveContained(it, newX, newY)
+                    } else {
+                        it.x = newX
+                        it.y = newY
+                    }
+                    invalidate()
+                }
 
                 // Remember this touch position for the next move event
                 mLastTouchX = x
@@ -173,8 +176,8 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 mActivePointerId = MotionEvent.INVALID_POINTER_ID
                 val activeMovable = mActiveMovable
-                if (activeMovable != null && (mInitialPosX != mPosX || mInitialPosY != mPosY)) {
-                    activeMovable.onMoved(mPosX, mPosY)
+                if (activeMovable != null && (mInitialPosX != activeMovable.x || mInitialPosY != activeMovable.y)) {
+                    activeMovable.onMoved(activeMovable.x, activeMovable.y)
                 }
             }
             MotionEvent.ACTION_POINTER_UP -> {
@@ -193,6 +196,30 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
             }
         }
         return true
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        mWidth = w
+        mHeight = h
+    }
+
+    private fun moveContained(movable: MovableT, newX: Float, newY: Float) {
+        movable.x = if (newX < 0.0f) {
+            0.0f
+        } else if (newX > mWidth - movable.width) {
+            mWidth - movable.width
+        } else {
+            newX
+        }
+
+        movable.y = if (newY < 0.0f) {
+            0.0f
+        } else if (newY > mHeight - movable.height) {
+            mHeight - movable.height
+        } else {
+            newY
+        }
     }
 
     fun addMovable(movable: MovableT, x: Float = 0.0f, y: Float = 0.0f) {

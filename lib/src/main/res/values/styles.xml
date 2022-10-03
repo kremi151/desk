@@ -3,6 +3,7 @@
     <style name="DeskView">
         <item name="deskView_debugMode">false</item>
         <item name="deskView_hardwareAccelerated">false</item>
+        <item name="deskView_containMovables">false</item>
         <item name="deskView_backgroundColor">@android:color/white</item>
     </style>
 </resources>
