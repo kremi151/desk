@@ -107,11 +107,37 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
             mActiveMovable?.let {
                 val oldWidth = it.width
                 val oldHeight = it.height
-                val newWidth = oldWidth * scaleFactor
-                val newHeight = oldHeight * scaleFactor
+                var newWidth = oldWidth * scaleFactor
+                var newHeight = oldHeight * scaleFactor
+
+                if (config.containMovables) {
+                    if (newWidth > mWidth) {
+                        newWidth = mWidth.toFloat()
+                    }
+                    if (newHeight > mHeight) {
+                        newHeight = mHeight.toFloat()
+                    }
+                }
+
                 it.remeasure(newWidth, newHeight)
+                check(it.width <= newWidth) { "New width ${it.width} must not be larger then available $newWidth" }
+                check(it.height <= newHeight) { "New height ${it.height} must not be larger then available $newHeight" }
+                newWidth = it.width
+                newHeight = it.height
+
                 it.x += (oldWidth - newWidth) / 2f
                 it.y += (oldHeight - newHeight) / 2f
+                if (it.x + newWidth > mWidth) {
+                    it.x = mWidth - it.width
+                } else if (it.x < 0.0f) {
+                    it.x = 0.0f
+                }
+                if (it.y + newHeight > mHeight) {
+                    it.y = mHeight - it.height
+                } else if (it.y < 0.0f) {
+                    it.y = 0.0f
+                }
+
                 invalidate()
             }
 
