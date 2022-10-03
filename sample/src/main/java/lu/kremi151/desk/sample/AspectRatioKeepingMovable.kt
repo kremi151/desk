@@ -8,13 +8,14 @@ import kotlin.math.min
 
 class AspectRatioKeepingMovable(
     color: Int,
-    aspectRatio: Float,
+    private val aspectRatio: Float,
     height: Float,
 ): Movable() {
     private val paint = Paint().apply {
         this.color = color
         style = Paint.Style.STROKE
         strokeWidth = 10.0f
+        textSize = 26.0f
     }
 
     private val referenceSize = SizeF(height * aspectRatio, height)
@@ -34,7 +35,13 @@ class AspectRatioKeepingMovable(
     }
 
     override fun draw(canvas: Canvas) {
+        paint.style = Paint.Style.STROKE
         canvas.drawRect(0.0f, 0.0f, width, height, paint)
+
+        paint.style = Paint.Style.FILL
+        val text = "Aspect ratio: $aspectRatio"
+        val textWidth = paint.measureText(text)
+        canvas.drawText(text, width - textWidth - 18.0f, height - 26.0f, paint)
     }
 
 }
