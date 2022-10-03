@@ -120,8 +120,8 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
                 }
 
                 it.remeasure(newWidth, newHeight)
-                check(it.width <= newWidth) { "New width ${it.width} must not be larger then available $newWidth" }
-                check(it.height <= newHeight) { "New height ${it.height} must not be larger then available $newHeight" }
+                check(it.width <= newWidth) { "New width ${it.width} must not be larger than available $newWidth" }
+                check(it.height <= newHeight) { "New height ${it.height} must not be larger than available $newHeight" }
                 newWidth = it.width
                 newHeight = it.height
 

@@ -19,6 +19,10 @@ class MainActivity : AppCompatActivity() {
                 Color.parseColor("#ba55da"),
                 Color.parseColor("#da55ba"),
             ),
+            AspectRatioKeepingMovable(
+                Color.parseColor("#00ff50"),
+                1.5f,
+            ),
         ).forEach {
             findViewById<DeskView>(R.id.deskView).addMovable(it)
         }
