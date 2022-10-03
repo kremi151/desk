@@ -44,4 +44,5 @@ jobs:
         with:
           min-versions-to-keep: 10
           delete-only-pre-release-versions: "true"
+        continue-on-error: true
         if: ${{ github.event_name != 'pull_request' }}
