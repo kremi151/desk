@@ -8,7 +8,8 @@ import kotlin.math.min
 
 class AspectRatioKeepingMovable(
     color: Int,
-    private val aspectRatio: Float,
+    aspectRatio: Float,
+    height: Float,
 ): Movable() {
     private val paint = Paint().apply {
         this.color = color
@@ -16,7 +17,7 @@ class AspectRatioKeepingMovable(
         strokeWidth = 10.0f
     }
 
-    private val referenceSize = 400.0f.let { SizeF(it * aspectRatio, it) }
+    private val referenceSize = SizeF(height * aspectRatio, height)
 
     override var width: Float = referenceSize.width
         private set

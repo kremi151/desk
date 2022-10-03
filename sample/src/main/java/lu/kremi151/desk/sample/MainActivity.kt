@@ -10,21 +10,31 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        listOf(
-            SampleMovable(
-                Color.parseColor("#bada55"),
-                Color.parseColor("#55daba"),
-            ),
-            SampleMovable(
-                Color.parseColor("#ba55da"),
-                Color.parseColor("#da55ba"),
-            ),
-            AspectRatioKeepingMovable(
-                Color.parseColor("#00ff50"),
-                1.5f,
-            ),
-        ).forEach {
-            findViewById<DeskView>(R.id.deskView).addMovable(it)
+        val deskView = findViewById<DeskView>(R.id.deskView)
+        deskView.post {
+            deskView.addMovable(SampleMovable(
+                color1 = Color.parseColor("#bada55"),
+                color2 = Color.parseColor("#55daba"),
+                width = 400.0f,
+                height = 400.0f,
+            ))
+            deskView.addMovable(
+                movable = SampleMovable(
+                    color1 = Color.parseColor("#ba55da"),
+                    color2 = Color.parseColor("#da55ba"),
+                    width = 400.0f,
+                    height = 400.0f,
+                ),
+                x = deskView.width - 400.0f,
+            )
+            deskView.addMovable(
+                movable = AspectRatioKeepingMovable(
+                    color = Color.parseColor("#00ff50"),
+                    aspectRatio = 1.5f,
+                    height = 400.0f,
+                ),
+                y = deskView.height - 400.0f,
+            )
         }
     }
 }

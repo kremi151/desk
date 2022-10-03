@@ -1,11 +1,15 @@
 package lu.kremi151.desk.sample
 
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import lu.kremi151.desk.datamodel.Movable
 
-class SampleMovable(color1: Int, color2: Int): Movable() {
+class SampleMovable(
+    color1: Int,
+    color2: Int,
+    width: Float,
+    height: Float,
+): Movable() {
 
     private val paint1 = Paint().apply {
         color = color1
@@ -16,10 +20,10 @@ class SampleMovable(color1: Int, color2: Int): Movable() {
         style = Paint.Style.FILL
     }
 
-    override var width: Float = 400.0f
+    override var width: Float = width
         private set
 
-    override var height: Float = 400.0f
+    override var height: Float = height
         private set
 
     override fun remeasure(desiredWidth: Float, desiredHeight: Float) {
