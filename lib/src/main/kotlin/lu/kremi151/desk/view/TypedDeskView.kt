@@ -16,6 +16,7 @@ import lu.kremi151.desk.internal.MovableCollection
 import kotlin.math.max
 import kotlin.math.min
 
+@Suppress("TooManyFunctions")
 open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -257,6 +258,18 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
 
     fun removeMovable(movable: MovableT): Boolean {
         return movables.remove(movable)
+    }
+
+    fun moveToForeground(movable: MovableT, entirely: Boolean = false) {
+        if (movables.moveToForeground(movable, entirely)) {
+            invalidate()
+        }
+    }
+
+    fun moveToBackground(movable: MovableT, entirely: Boolean = false) {
+        if (movables.moveToBackground(movable, entirely)) {
+            invalidate()
+        }
     }
 
     private fun pause() {

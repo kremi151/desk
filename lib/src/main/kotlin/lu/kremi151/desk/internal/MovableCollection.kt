@@ -67,6 +67,40 @@ internal class MovableCollection<MovableT: Movable> {
         }
     }
 
+    fun moveToForeground(movable: MovableT, entirely: Boolean): Boolean {
+        synchronized(movables) {
+            val index = movables.indexOf(movable)
+            if (index < 0 || index >= movables.size - 1) {
+                return false
+            }
+            movables.removeAt(index).let {
+                if (entirely) {
+                    movables.add(it)
+                } else {
+                    movables.add(index + 1, it)
+                }
+            }
+            return true
+        }
+    }
+
+    fun moveToBackground(movable: MovableT, entirely: Boolean): Boolean {
+        synchronized(movables) {
+            val index = movables.indexOf(movable)
+            if (index <= 0) {
+                return false
+            }
+            movables.removeAt(index).let {
+                if (entirely) {
+                    movables.add(0, it)
+                } else {
+                    movables.add(index - 1, it)
+                }
+            }
+            return true
+        }
+    }
+
     fun addListener(listener: Listener<MovableT>) {
         synchronized(listener) {
             listeners.add(listener)
