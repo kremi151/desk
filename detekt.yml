@@ -3,3 +3,11 @@ style:
     active: true
     values: ['TODO:', 'FIXME:']
     allowedPatterns: '(TODO|FIXME):\s.*?\s\(#\d+\)'
+  ReturnCount:
+    active: true
+    max: 3
+
+complexity:
+  LongMethod:
+    active: true
+    threshold: 62

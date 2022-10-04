@@ -105,42 +105,48 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
 
         override fun onScale(detector: ScaleGestureDetector): Boolean {
             val scaleFactor = max(SCALE_FACTOR_MINIMUM, min(SCALE_FACTOR_MAXIMUM, detector.scaleFactor))
-            mActiveMovable?.let {
-                val oldWidth = it.width
-                val oldHeight = it.height
-                var newWidth = oldWidth * scaleFactor
-                var newHeight = oldHeight * scaleFactor
 
-                if (config.containMovables) {
-                    if (newWidth > mWidth) {
-                        newWidth = mWidth.toFloat()
-                    }
-                    if (newHeight > mHeight) {
-                        newHeight = mHeight.toFloat()
-                    }
-                }
-
-                it.remeasure(newWidth, newHeight)
-                check(it.width <= newWidth) { "New width ${it.width} must not be larger than available $newWidth" }
-                check(it.height <= newHeight) { "New height ${it.height} must not be larger than available $newHeight" }
-                newWidth = it.width
-                newHeight = it.height
-
-                it.x += (oldWidth - newWidth) / 2f
-                it.y += (oldHeight - newHeight) / 2f
-                if (it.x + newWidth > mWidth) {
-                    it.x = mWidth - it.width
-                } else if (it.x < 0.0f) {
-                    it.x = 0.0f
-                }
-                if (it.y + newHeight > mHeight) {
-                    it.y = mHeight - it.height
-                } else if (it.y < 0.0f) {
-                    it.y = 0.0f
-                }
-
-                invalidate()
+            val activeMovable = mActiveMovable ?: return true
+            if (activeMovable.locked) {
+                return true
             }
+
+            val oldWidth = activeMovable.width
+            val oldHeight = activeMovable.height
+            var newWidth = oldWidth * scaleFactor
+            var newHeight = oldHeight * scaleFactor
+
+            if (config.containMovables) {
+                if (newWidth > mWidth) {
+                    newWidth = mWidth.toFloat()
+                }
+                if (newHeight > mHeight) {
+                    newHeight = mHeight.toFloat()
+                }
+            }
+
+            activeMovable.remeasure(newWidth, newHeight)
+            with(activeMovable) {
+                check(width <= newWidth) {"New width $width must not be larger than available $newWidth" }
+                check(height <= newHeight) { "New height $height must not be larger than available $newHeight" }
+                newWidth = width
+                newHeight = height
+            }
+
+            activeMovable.x += (oldWidth - newWidth) / 2f
+            activeMovable.y += (oldHeight - newHeight) / 2f
+            if (activeMovable.x + newWidth > mWidth) {
+                activeMovable.x = mWidth - activeMovable.width
+            } else if (activeMovable.x < 0.0f) {
+                activeMovable.x = 0.0f
+            }
+            if (activeMovable.y + newHeight > mHeight) {
+                activeMovable.y = mHeight - activeMovable.height
+            } else if (activeMovable.y < 0.0f) {
+                activeMovable.y = 0.0f
+            }
+
+            invalidate()
 
             return true
         }
@@ -183,15 +189,16 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
                         event.getX(pointerIndex) to event.getY(pointerIndex)
                     }
 
-                mActiveMovable?.let {
-                    val newX = it.x + x - mLastTouchX
-                    val newY = it.y + y - mLastTouchY
+                val activeMovable = mActiveMovable
+                if (activeMovable?.locked == false) {
+                    val newX = activeMovable.x + x - mLastTouchX
+                    val newY = activeMovable.y + y - mLastTouchY
 
                     if (config.containMovables) {
-                        moveContained(it, newX, newY)
+                        moveContained(activeMovable, newX, newY)
                     } else {
-                        it.x = newX
-                        it.y = newY
+                        activeMovable.x = newX
+                        activeMovable.y = newY
                     }
                     invalidate()
                 }
