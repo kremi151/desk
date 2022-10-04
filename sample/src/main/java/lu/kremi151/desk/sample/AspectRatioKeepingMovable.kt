@@ -3,7 +3,7 @@ package lu.kremi151.desk.sample
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.SizeF
-import lu.kremi151.desk.datamodel.Movable
+import lu.kremi151.desk.api.Movable
 import kotlin.math.min
 
 class AspectRatioKeepingMovable(

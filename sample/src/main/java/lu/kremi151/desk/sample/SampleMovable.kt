@@ -2,7 +2,7 @@ package lu.kremi151.desk.sample
 
 import android.graphics.Canvas
 import android.graphics.Paint
-import lu.kremi151.desk.datamodel.Movable
+import lu.kremi151.desk.api.Movable
 
 class SampleMovable(
     color1: Int,

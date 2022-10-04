@@ -5,7 +5,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.view.SurfaceHolder
 import lu.kremi151.desk.BuildConfig
-import lu.kremi151.desk.datamodel.Movable
+import lu.kremi151.desk.api.Movable
 import java.util.concurrent.Semaphore
 
 internal class DeskViewThread<MovableT : Movable>(

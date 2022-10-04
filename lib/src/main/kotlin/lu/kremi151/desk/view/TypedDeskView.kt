@@ -9,7 +9,7 @@ import android.view.ScaleGestureDetector
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import lu.kremi151.desk.R
-import lu.kremi151.desk.datamodel.Movable
+import lu.kremi151.desk.api.Movable
 import lu.kremi151.desk.internal.DeskViewConfig
 import lu.kremi151.desk.internal.DeskViewThread
 import lu.kremi151.desk.internal.MovableCollection

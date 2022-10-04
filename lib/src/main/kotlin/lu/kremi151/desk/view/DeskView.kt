@@ -2,7 +2,7 @@ package lu.kremi151.desk.view
 
 import android.content.Context
 import android.util.AttributeSet
-import lu.kremi151.desk.datamodel.Movable
+import lu.kremi151.desk.api.Movable
 
 class DeskView @JvmOverloads constructor(
     context: Context, attrs:

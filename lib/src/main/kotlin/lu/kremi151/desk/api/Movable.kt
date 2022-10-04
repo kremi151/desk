@@ -1,4 +1,4 @@
-package lu.kremi151.desk.datamodel
+package lu.kremi151.desk.api
 
 import android.graphics.Canvas
 import java.util.*

@@ -1,6 +1,6 @@
 package lu.kremi151.desk.internal
 
-import lu.kremi151.desk.datamodel.Movable
+import lu.kremi151.desk.api.Movable
 import java.util.*
 
 internal class MovableCollection<MovableT: Movable> {
