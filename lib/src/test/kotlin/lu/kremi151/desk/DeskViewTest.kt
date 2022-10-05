@@ -3,7 +3,6 @@ package lu.kremi151.desk
 import android.content.Context
 import android.os.SystemClock
 import android.view.MotionEvent
-import lu.kremi151.desk.api.Movable
 import lu.kremi151.desk.util.TestMovable
 import lu.kremi151.desk.view.DeskView
 import org.junit.Assert.*
@@ -23,8 +22,8 @@ class DeskViewTest {
 
     private lateinit var deskView: DeskView
 
-    private lateinit var movable1: Movable
-    private lateinit var movable2: Movable
+    private lateinit var movable1: TestMovable
+    private lateinit var movable2: TestMovable
 
     @Before
     fun before() {
@@ -72,6 +71,32 @@ class DeskViewTest {
         deskView.onTouchEvent(makeTouch(700.1f, 700.1f, MotionEvent.ACTION_DOWN))
         deskView.onTouchEvent(makeTouch(700.1f, 700.1f, MotionEvent.ACTION_UP))
         assertNull(deskView.focusedMovable)
+    }
+
+    @Test
+    fun testFocusAndBlurCallback() {
+        assertFalse(movable1.focused)
+        assertFalse(movable2.focused)
+
+        deskView.onTouchEvent(makeTouch(99.9f, 99.9f, MotionEvent.ACTION_DOWN))
+        deskView.onTouchEvent(makeTouch(99.9f, 99.9f, MotionEvent.ACTION_UP))
+        assertFalse(movable1.focused)
+        assertFalse(movable2.focused)
+
+        deskView.onTouchEvent(makeTouch(200f, 200f, MotionEvent.ACTION_DOWN))
+        deskView.onTouchEvent(makeTouch(200f, 200f, MotionEvent.ACTION_UP))
+        assertTrue(movable1.focused)
+        assertFalse(movable2.focused)
+
+        deskView.onTouchEvent(makeTouch(400f, 400f, MotionEvent.ACTION_DOWN))
+        deskView.onTouchEvent(makeTouch(400f, 400f, MotionEvent.ACTION_UP))
+        assertFalse(movable1.focused)
+        assertTrue(movable2.focused)
+
+        deskView.onTouchEvent(makeTouch(700.1f, 700.1f, MotionEvent.ACTION_DOWN))
+        deskView.onTouchEvent(makeTouch(700.1f, 700.1f, MotionEvent.ACTION_UP))
+        assertFalse(movable1.focused)
+        assertFalse(movable2.focused)
     }
 
     private fun makeTouch(x: Float, y: Float, event: Int) = MotionEvent.obtain(
