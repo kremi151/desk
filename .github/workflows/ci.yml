@@ -25,14 +25,14 @@ jobs:
         with:
           path: '${{ github.workspace }}/lib/build/reports/detekt/detekt.xml'
         if: always()
-#      - name: Test
-#        run: ./gradlew testReleaseUnitTest
-#      - name: Report test results
-#        uses: ashley-taylor/junit-report-annotations-action@master
-#        with:
-#          access-token: ${{ secrets.GITHUB_TOKEN }}
-#          path: "${{ github.workspace }}/app/build/test-results/**/*.xml"
-#        if: always()
+      - name: Test
+        run: ./gradlew :lib:testReleaseUnitTest
+      - name: Report test results
+        uses: ashley-taylor/junit-report-annotations-action@master
+        with:
+          access-token: ${{ secrets.GITHUB_TOKEN }}
+          path: "${{ github.workspace }}/lib/build/test-results/**/*.xml"
+        if: always()
       - name: Publish Maven artifact
         run: ./gradlew :lib:publish
         env:

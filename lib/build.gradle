@@ -17,6 +17,12 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -64,4 +70,19 @@ detektTask.configure {
 }
 
 dependencies {
+    def jUnitVersion = "4.13.2"
+    def androidXTestVersion = "1.4.0"
+    def roboelectricVersion = "4.9"
+    def mockitoVersion = "4.8.0"
+    def mockitoKotlinVersion = "3.2.0"
+
+    // Required -- JUnit 4 framework
+    testImplementation "junit:junit:$jUnitVersion"
+    // Optional -- Robolectric environment
+    testImplementation "androidx.test:core:$androidXTestVersion"
+    testImplementation "org.robolectric:robolectric:$roboelectricVersion"
+    // Optional -- Mockito framework
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+    // Optional -- mockito-kotlin
+    testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
 }
