@@ -127,7 +127,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
 
             activeMovable.remeasure(newWidth, newHeight)
             with(activeMovable) {
-                check(width <= newWidth) {"New width $width must not be larger than available $newWidth" }
+                check(width <= newWidth) { "New width $width must not be larger than available $newWidth" }
                 check(height <= newHeight) { "New height $height must not be larger than available $newHeight" }
                 newWidth = width
                 newHeight = height
@@ -171,9 +171,16 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
                     // Remember where we started (for dragging)
                     mLastTouchX = event.getX(pointerIndex)
                     mLastTouchY = event.getY(pointerIndex)
-                    mActiveMovable = findMovableByPos(mLastTouchX, mLastTouchY)?.also { m ->
-                        mInitialPosX = m.x
-                        mInitialPosY = m.y
+
+                    val currentActiveMovable = mActiveMovable
+                    val activeMovable = findMovableByPos(mLastTouchX, mLastTouchY)
+                    if (currentActiveMovable != null && mActiveMovable?.id != currentActiveMovable.id) {
+                        currentActiveMovable.onBlur()
+                    }
+                    if (activeMovable != null) {
+                        mInitialPosX = activeMovable.x
+                        mInitialPosY = activeMovable.y
+                        activeMovable.onFocus()
                     }
                 }
 
