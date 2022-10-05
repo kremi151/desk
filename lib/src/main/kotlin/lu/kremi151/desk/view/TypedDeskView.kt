@@ -181,7 +181,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
 
             val currentActiveMovable = mActiveMovable
             val activeMovable = findMovableByPos(mLastTouchX, mLastTouchY)
-            if (currentActiveMovable != null && mActiveMovable?.id != currentActiveMovable.id) {
+            if (currentActiveMovable != null && activeMovable?.id != currentActiveMovable.id) {
                 currentActiveMovable.onBlur()
             }
             if (activeMovable != null) {

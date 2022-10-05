@@ -14,7 +14,7 @@ internal class MovableCollection<MovableT: Movable> {
         val id = UUID.randomUUID()
         synchronized(movables) {
             movables.add(movable)
-            idToState[id] = movable
+            idToState[id] = movable.also { it.id = id }
         }
         synchronized(listeners) {
             listeners.forEach {
@@ -28,7 +28,7 @@ internal class MovableCollection<MovableT: Movable> {
             idToState.remove(id)
         } ?: return false
         val removed = synchronized(movables) {
-            movables.remove(toRemove)
+            movables.remove(toRemove.also { it.id = null })
         }
         if (removed) {
             synchronized(listeners) {
