@@ -189,6 +189,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
                 mInitialPosY = activeMovable.y
                 activeMovable.onFocus()
             }
+            mActiveMovable = activeMovable
         }
 
         // Save the ID of this pointer (for dragging)
