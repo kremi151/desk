@@ -158,7 +158,6 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
     private val mScaleDetector = ScaleGestureDetector(context, scaleListener)
 
     @SuppressLint("ClickableViewAccessibility")
-    @Suppress("ComplexMethod")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         mScaleDetector.onTouchEvent(event)
         if (mScaleDetector.isInProgress) {
@@ -166,77 +165,84 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         }
 
         when (event.action) {
-            MotionEvent.ACTION_DOWN -> {
-                event.actionIndex.also { pointerIndex ->
-                    // Remember where we started (for dragging)
-                    mLastTouchX = event.getX(pointerIndex)
-                    mLastTouchY = event.getY(pointerIndex)
-
-                    val currentActiveMovable = mActiveMovable
-                    val activeMovable = findMovableByPos(mLastTouchX, mLastTouchY)
-                    if (currentActiveMovable != null && mActiveMovable?.id != currentActiveMovable.id) {
-                        currentActiveMovable.onBlur()
-                    }
-                    if (activeMovable != null) {
-                        mInitialPosX = activeMovable.x
-                        mInitialPosY = activeMovable.y
-                        activeMovable.onFocus()
-                    }
-                }
-
-                // Save the ID of this pointer (for dragging)
-                mActivePointerId = event.getPointerId(0)
-            }
-
-            MotionEvent.ACTION_MOVE -> {
-                // Find the index of the active pointer and fetch its position
-                val (x: Float, y: Float) =
-                    event.findPointerIndex(mActivePointerId).let { pointerIndex ->
-                        // Calculate the distance moved
-                        event.getX(pointerIndex) to event.getY(pointerIndex)
-                    }
-
-                val activeMovable = mActiveMovable
-                if (activeMovable?.locked == false) {
-                    val newX = activeMovable.x + x - mLastTouchX
-                    val newY = activeMovable.y + y - mLastTouchY
-
-                    if (config.containMovables) {
-                        moveContained(activeMovable, newX, newY)
-                    } else {
-                        activeMovable.x = newX
-                        activeMovable.y = newY
-                    }
-                    invalidate()
-                }
-
-                // Remember this touch position for the next move event
-                mLastTouchX = x
-                mLastTouchY = y
-            }
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                mActivePointerId = MotionEvent.INVALID_POINTER_ID
-                val activeMovable = mActiveMovable
-                if (activeMovable != null && (mInitialPosX != activeMovable.x || mInitialPosY != activeMovable.y)) {
-                    activeMovable.onMoved(activeMovable.x, activeMovable.y)
-                }
-            }
-            MotionEvent.ACTION_POINTER_UP -> {
-                event.actionIndex.also { pointerIndex ->
-                    event.getPointerId(pointerIndex)
-                        .takeIf { it == mActivePointerId }
-                        ?.run {
-                            // This was our active pointer going up. Choose a new
-                            // active pointer and adjust accordingly.
-                            val newPointerIndex = if (pointerIndex == 0) 1 else 0
-                            mLastTouchX = event.getX(newPointerIndex)
-                            mLastTouchY = event.getY(newPointerIndex)
-                            mActivePointerId = event.getPointerId(newPointerIndex)
-                        }
-                }
-            }
+            MotionEvent.ACTION_DOWN -> handleActionDown(event)
+            MotionEvent.ACTION_MOVE -> handleActionMove(event)
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> handleActionUpOrCancel()
+            MotionEvent.ACTION_POINTER_UP -> handleActionPointerUp(event)
         }
         return true
+    }
+
+    private fun handleActionDown(event: MotionEvent) {
+        event.actionIndex.also { pointerIndex ->
+            // Remember where we started (for dragging)
+            mLastTouchX = event.getX(pointerIndex)
+            mLastTouchY = event.getY(pointerIndex)
+
+            val currentActiveMovable = mActiveMovable
+            val activeMovable = findMovableByPos(mLastTouchX, mLastTouchY)
+            if (currentActiveMovable != null && mActiveMovable?.id != currentActiveMovable.id) {
+                currentActiveMovable.onBlur()
+            }
+            if (activeMovable != null) {
+                mInitialPosX = activeMovable.x
+                mInitialPosY = activeMovable.y
+                activeMovable.onFocus()
+            }
+        }
+
+        // Save the ID of this pointer (for dragging)
+        mActivePointerId = event.getPointerId(0)
+    }
+
+    private fun handleActionMove(event: MotionEvent) {
+        // Find the index of the active pointer and fetch its position
+        val (x: Float, y: Float) =
+            event.findPointerIndex(mActivePointerId).let { pointerIndex ->
+                // Calculate the distance moved
+                event.getX(pointerIndex) to event.getY(pointerIndex)
+            }
+
+        val activeMovable = mActiveMovable
+        if (activeMovable?.locked == false) {
+            val newX = activeMovable.x + x - mLastTouchX
+            val newY = activeMovable.y + y - mLastTouchY
+
+            if (config.containMovables) {
+                moveContained(activeMovable, newX, newY)
+            } else {
+                activeMovable.x = newX
+                activeMovable.y = newY
+            }
+            invalidate()
+        }
+
+        // Remember this touch position for the next move event
+        mLastTouchX = x
+        mLastTouchY = y
+    }
+
+    private fun handleActionUpOrCancel() {
+        mActivePointerId = MotionEvent.INVALID_POINTER_ID
+        val activeMovable = mActiveMovable
+        if (activeMovable != null && (mInitialPosX != activeMovable.x || mInitialPosY != activeMovable.y)) {
+            activeMovable.onMoved(activeMovable.x, activeMovable.y)
+        }
+    }
+
+    private fun handleActionPointerUp(event: MotionEvent) {
+        event.actionIndex.also { pointerIndex ->
+            event.getPointerId(pointerIndex)
+                .takeIf { it == mActivePointerId }
+                ?.run {
+                    // This was our active pointer going up. Choose a new
+                    // active pointer and adjust accordingly.
+                    val newPointerIndex = if (pointerIndex == 0) 1 else 0
+                    mLastTouchX = event.getX(newPointerIndex)
+                    mLastTouchY = event.getY(newPointerIndex)
+                    mActivePointerId = event.getPointerId(newPointerIndex)
+                }
+        }
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
