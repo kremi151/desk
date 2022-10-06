@@ -14,6 +14,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
+import org.robolectric.shadows.ShadowSystemClock
+import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricTestRunner::class)
 class DeskViewTest {
@@ -125,6 +127,42 @@ class DeskViewTest {
         assertEquals(80.0f, movable1.y)
         assertEquals(260.0f, movable2.x)
         assertEquals(280.0f, movable2.y)
+    }
+
+    @Test
+    fun testMovingMovableWithSwipeThreshold() {
+        deskView.config = deskView.config.copy(
+            swipeThreshold = 200,
+        )
+
+        assertEquals(100.0f, movable1.x)
+        assertEquals(100.0f, movable1.y)
+
+        deskView.onTouchEvent(makeTouch(200f, 200f, MotionEvent.ACTION_DOWN))
+        ShadowSystemClock.advanceBy(45L, TimeUnit.MILLISECONDS)
+        deskView.onTouchEvent(makeTouch(210f, 205f, MotionEvent.ACTION_MOVE))
+        ShadowSystemClock.advanceBy(45L, TimeUnit.MILLISECONDS)
+        deskView.onTouchEvent(makeTouch(220f, 210f, MotionEvent.ACTION_MOVE))
+        ShadowSystemClock.advanceBy(45L, TimeUnit.MILLISECONDS)
+        deskView.onTouchEvent(makeTouch(230f, 215f, MotionEvent.ACTION_MOVE))
+        ShadowSystemClock.advanceBy(45L, TimeUnit.MILLISECONDS)
+        deskView.onTouchEvent(makeTouch(230f, 215f, MotionEvent.ACTION_UP))
+
+        assertEquals(100.0f, movable1.x)
+        assertEquals(100.0f, movable1.y)
+
+        deskView.onTouchEvent(makeTouch(200f, 200f, MotionEvent.ACTION_DOWN))
+        ShadowSystemClock.advanceBy(75L, TimeUnit.MILLISECONDS)
+        deskView.onTouchEvent(makeTouch(210f, 205f, MotionEvent.ACTION_MOVE))
+        ShadowSystemClock.advanceBy(75L, TimeUnit.MILLISECONDS)
+        deskView.onTouchEvent(makeTouch(220f, 210f, MotionEvent.ACTION_MOVE))
+        ShadowSystemClock.advanceBy(75L, TimeUnit.MILLISECONDS)
+        deskView.onTouchEvent(makeTouch(230f, 215f, MotionEvent.ACTION_MOVE))
+        ShadowSystemClock.advanceBy(75L, TimeUnit.MILLISECONDS)
+        deskView.onTouchEvent(makeTouch(230f, 215f, MotionEvent.ACTION_UP))
+
+        assertEquals(130.0f, movable1.x)
+        assertEquals(115.0f, movable1.y)
     }
 
     private fun makeTouch(x: Float, y: Float, event: Int) = MotionEvent.obtain(
