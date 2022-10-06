@@ -50,51 +50,35 @@ class DeskViewTest {
     }
 
     @Test
-    fun testMovableSelection() {
+    fun testMovableSelectionAndFocus() {
         assertEquals(800, deskView.width)
         assertEquals(1200, deskView.height)
 
         assertNull(deskView.focusedMovable)
+        assertFalse(movable1.focused)
+        assertFalse(movable2.focused)
 
         deskView.onTouchEvent(makeTouch(99.9f, 99.9f, MotionEvent.ACTION_DOWN))
         deskView.onTouchEvent(makeTouch(99.9f, 99.9f, MotionEvent.ACTION_UP))
         assertNull(deskView.focusedMovable)
+        assertFalse(movable1.focused)
+        assertFalse(movable2.focused)
 
         deskView.onTouchEvent(makeTouch(200f, 200f, MotionEvent.ACTION_DOWN))
         deskView.onTouchEvent(makeTouch(200f, 200f, MotionEvent.ACTION_UP))
         assertEquals(movable1, deskView.focusedMovable)
-
-        deskView.onTouchEvent(makeTouch(400f, 400f, MotionEvent.ACTION_DOWN))
-        deskView.onTouchEvent(makeTouch(400f, 400f, MotionEvent.ACTION_UP))
-        assertEquals(movable2, deskView.focusedMovable)
-
-        deskView.onTouchEvent(makeTouch(700.1f, 700.1f, MotionEvent.ACTION_DOWN))
-        deskView.onTouchEvent(makeTouch(700.1f, 700.1f, MotionEvent.ACTION_UP))
-        assertNull(deskView.focusedMovable)
-    }
-
-    @Test
-    fun testFocusAndBlurCallback() {
-        assertFalse(movable1.focused)
-        assertFalse(movable2.focused)
-
-        deskView.onTouchEvent(makeTouch(99.9f, 99.9f, MotionEvent.ACTION_DOWN))
-        deskView.onTouchEvent(makeTouch(99.9f, 99.9f, MotionEvent.ACTION_UP))
-        assertFalse(movable1.focused)
-        assertFalse(movable2.focused)
-
-        deskView.onTouchEvent(makeTouch(200f, 200f, MotionEvent.ACTION_DOWN))
-        deskView.onTouchEvent(makeTouch(200f, 200f, MotionEvent.ACTION_UP))
         assertTrue(movable1.focused)
         assertFalse(movable2.focused)
 
         deskView.onTouchEvent(makeTouch(400f, 400f, MotionEvent.ACTION_DOWN))
         deskView.onTouchEvent(makeTouch(400f, 400f, MotionEvent.ACTION_UP))
+        assertEquals(movable2, deskView.focusedMovable)
         assertFalse(movable1.focused)
         assertTrue(movable2.focused)
 
         deskView.onTouchEvent(makeTouch(700.1f, 700.1f, MotionEvent.ACTION_DOWN))
         deskView.onTouchEvent(makeTouch(700.1f, 700.1f, MotionEvent.ACTION_UP))
+        assertNull(deskView.focusedMovable)
         assertFalse(movable1.focused)
         assertFalse(movable2.focused)
     }
