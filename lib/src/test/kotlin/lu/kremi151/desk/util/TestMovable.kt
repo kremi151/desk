@@ -28,5 +28,6 @@ class TestMovable(
         focused = false
     }
 
+    @Suppress("EmptyFunctionBlock")
     override fun draw(canvas: Canvas) {}
 }
