@@ -18,13 +18,15 @@ jobs:
         uses: actions/checkout@v2
       - name: Build
         run: ./gradlew :lib:assembleRelease -x test
-      - name: Validate
-        run: ./gradlew detekt :lib:testReleaseUnitTest
+      - name: Detekt
+        run: ./gradlew detekt
       - name: Report detekt findings
         uses: jwgmeligmeyling/checkstyle-github-action@v1.2
         with:
           path: '${{ github.workspace }}/lib/build/reports/detekt/detekt.xml'
         if: always()
+      - name: Test
+        run: ./gradlew :lib:testReleaseUnitTest
       - name: Report test results
         uses: ashley-taylor/junit-report-annotations-action@master
         with:
