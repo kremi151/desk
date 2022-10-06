@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.view.SurfaceHolder
 import lu.kremi151.desk.BuildConfig
 import lu.kremi151.desk.api.Movable
+import lu.kremi151.desk.config.DeskViewConfig
 import java.util.concurrent.Semaphore
 
 internal class DeskViewThread<MovableT : Movable>(

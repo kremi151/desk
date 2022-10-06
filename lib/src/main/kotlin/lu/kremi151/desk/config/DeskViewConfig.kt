@@ -1,4 +1,4 @@
-package lu.kremi151.desk.internal
+package lu.kremi151.desk.config
 
 import android.graphics.Color
 
@@ -7,4 +7,5 @@ data class DeskViewConfig(
     val debugMode: Boolean = false,
     val hardwareAccelerated: Boolean = false,
     val containMovables: Boolean = false,
+    val swipeThreshold: Int = 100,
 )

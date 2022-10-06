@@ -6,5 +6,6 @@
         <attr name="deskView_hardwareAccelerated" format="boolean"/>
         <attr name="deskView_containMovables" format="boolean"/>
         <attr name="deskView_backgroundColor" format="color"/>
+        <attr name="deskView_swipeThreshold" format="integer"/>
     </declare-styleable>
 </resources>

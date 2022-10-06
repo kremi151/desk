@@ -3,6 +3,7 @@ package lu.kremi151.desk.view
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
+import android.os.SystemClock
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
@@ -10,7 +11,7 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import lu.kremi151.desk.R
 import lu.kremi151.desk.api.Movable
-import lu.kremi151.desk.internal.DeskViewConfig
+import lu.kremi151.desk.config.DeskViewConfig
 import lu.kremi151.desk.internal.DeskViewThread
 import lu.kremi151.desk.internal.MovableCollection
 import kotlin.math.max
@@ -62,6 +63,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
     private var mLastTouchX: Float = 0f
     private var mLastTouchY: Float = 0f
     private var mActivePointerId: Int = MotionEvent.INVALID_POINTER_ID
+    private var mTouchStarted: Long = 0L
     private var mActiveMovable: MovableT? = null
 
     private var mWidth: Int = 0
@@ -82,6 +84,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
             hardwareAccelerated = typedArray.getBoolean(R.styleable.TypedDeskView_deskView_hardwareAccelerated, false),
             containMovables = typedArray.getBoolean(R.styleable.TypedDeskView_deskView_containMovables, false),
             backgroundColor = typedArray.getColor(R.styleable.TypedDeskView_deskView_backgroundColor, Color.WHITE),
+            swipeThreshold = typedArray.getInt(R.styleable.TypedDeskView_deskView_swipeThreshold, 100),
         )
         this.config = config
         typedArray.recycle()
@@ -174,6 +177,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
     }
 
     private fun handleActionDown(event: MotionEvent) {
+        mTouchStarted = SystemClock.uptimeMillis()
         event.actionIndex.also { pointerIndex ->
             // Remember where we started (for dragging)
             mLastTouchX = event.getX(pointerIndex)
@@ -203,6 +207,10 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
                 // Calculate the distance moved
                 event.getX(pointerIndex) to event.getY(pointerIndex)
             }
+
+        if (SystemClock.uptimeMillis() - mTouchStarted < config.swipeThreshold) {
+            return
+        }
 
         val activeMovable = mActiveMovable
         if (activeMovable?.locked == false) {

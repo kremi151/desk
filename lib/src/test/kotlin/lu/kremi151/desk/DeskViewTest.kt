@@ -33,6 +33,11 @@ class DeskViewTest {
         deskView.right = 800
         deskView.bottom = 1200
 
+        deskView.config = deskView.config.copy(
+            // Disable swipe threshold by default in tests
+            swipeThreshold = 0,
+        )
+
         movable1 = TestMovable(400.0f, 400.0f).also {
             deskView.addMovable(
                 movable = it,
