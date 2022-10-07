@@ -7,9 +7,7 @@ import lu.kremi151.desk.extensions.assertPos
 import lu.kremi151.desk.util.TestMovable
 import lu.kremi151.desk.view.DeskView
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -70,32 +68,38 @@ class DeskViewTest {
     @Test
     fun testMovableSelectionAndFocus() {
         assertNull(deskView.focusedMovable)
-        assertFalse(movable1.focused)
-        assertFalse(movable2.focused)
+        assertEquals(0, movable1.focusedCounter)
+        assertEquals(0, movable2.focusedCounter)
 
         deskView.onTouchEvent(makeTouch(99.9f, 99.9f, MotionEvent.ACTION_DOWN))
         deskView.onTouchEvent(makeTouch(99.9f, 99.9f, MotionEvent.ACTION_UP))
         assertNull(deskView.focusedMovable)
-        assertFalse(movable1.focused)
-        assertFalse(movable2.focused)
+        assertEquals(0, movable1.focusedCounter)
+        assertEquals(0, movable2.focusedCounter)
 
         deskView.onTouchEvent(makeTouch(200f, 200f, MotionEvent.ACTION_DOWN))
         deskView.onTouchEvent(makeTouch(200f, 200f, MotionEvent.ACTION_UP))
         assertEquals(movable1, deskView.focusedMovable)
-        assertTrue(movable1.focused)
-        assertFalse(movable2.focused)
+        assertEquals(1, movable1.focusedCounter)
+        assertEquals(0, movable2.focusedCounter)
 
         deskView.onTouchEvent(makeTouch(400f, 400f, MotionEvent.ACTION_DOWN))
         deskView.onTouchEvent(makeTouch(400f, 400f, MotionEvent.ACTION_UP))
         assertEquals(movable2, deskView.focusedMovable)
-        assertFalse(movable1.focused)
-        assertTrue(movable2.focused)
+        assertEquals(0, movable1.focusedCounter)
+        assertEquals(1, movable2.focusedCounter)
+
+        deskView.onTouchEvent(makeTouch(450f, 450f, MotionEvent.ACTION_DOWN))
+        deskView.onTouchEvent(makeTouch(450f, 450f, MotionEvent.ACTION_UP))
+        assertEquals(movable2, deskView.focusedMovable)
+        assertEquals(0, movable1.focusedCounter)
+        assertEquals(1, movable2.focusedCounter)
 
         deskView.onTouchEvent(makeTouch(700.1f, 700.1f, MotionEvent.ACTION_DOWN))
         deskView.onTouchEvent(makeTouch(700.1f, 700.1f, MotionEvent.ACTION_UP))
         assertNull(deskView.focusedMovable)
-        assertFalse(movable1.focused)
-        assertFalse(movable2.focused)
+        assertEquals(0, movable1.focusedCounter)
+        assertEquals(0, movable2.focusedCounter)
     }
 
     @Test

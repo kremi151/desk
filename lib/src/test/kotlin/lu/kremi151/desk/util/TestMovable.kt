@@ -8,7 +8,7 @@ class TestMovable(
     private var mHeight: Float,
 ): Movable() {
 
-    var focused: Boolean = false
+    var focusedCounter = 0
     var tappedX: Float = -1.0f
     var tappedY: Float = -1.0f
 
@@ -23,11 +23,11 @@ class TestMovable(
     }
 
     override fun onFocus() {
-        focused = true
+        focusedCounter++
     }
 
     override fun onBlur() {
-        focused = false
+        focusedCounter = 0
     }
 
     override fun onTapped(x: Float, y: Float) {

@@ -196,7 +196,9 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
             if (activeMovable != null) {
                 mInitialPosX = activeMovable.x
                 mInitialPosY = activeMovable.y
-                activeMovable.onFocus() // TODO: Call this only once
+                if (currentActiveMovable == null || activeMovable.id != currentActiveMovable.id) {
+                    activeMovable.onFocus()
+                }
                 activeMovable.onTapped(mLastTouchX - mInitialPosX, mLastTouchY - mInitialPosY)
             }
             mActiveMovable = activeMovable
