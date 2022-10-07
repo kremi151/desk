@@ -27,6 +27,8 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
     companion object {
         private const val SCALE_FACTOR_MINIMUM = 0.1f
         private const val SCALE_FACTOR_MAXIMUM = 5.0f
+
+        private const val DEFAULT_SWIPE_THRESHOLD_MS = 100
     }
 
     private var thread: DeskViewThread<MovableT>? = null
@@ -84,7 +86,10 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
             hardwareAccelerated = typedArray.getBoolean(R.styleable.TypedDeskView_deskView_hardwareAccelerated, false),
             containMovables = typedArray.getBoolean(R.styleable.TypedDeskView_deskView_containMovables, false),
             backgroundColor = typedArray.getColor(R.styleable.TypedDeskView_deskView_backgroundColor, Color.WHITE),
-            swipeThreshold = typedArray.getInt(R.styleable.TypedDeskView_deskView_swipeThreshold, 100),
+            swipeThreshold = typedArray.getInt(
+                R.styleable.TypedDeskView_deskView_swipeThreshold,
+                DEFAULT_SWIPE_THRESHOLD_MS,
+            ),
         )
         this.config = config
         typedArray.recycle()
