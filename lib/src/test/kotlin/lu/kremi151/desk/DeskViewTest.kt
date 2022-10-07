@@ -165,6 +165,19 @@ class DeskViewTest {
         movable1.assertPos(130.0f, 115.0f)
     }
 
+    @Test
+    fun testOnTappedCallback() {
+        deskView.onTouchEvent(makeTouch(175f, 175f, MotionEvent.ACTION_DOWN))
+        deskView.onTouchEvent(makeTouch(175f, 175f, MotionEvent.ACTION_UP))
+        assertEquals(75.0f, movable1.tappedX)
+        assertEquals(75.0f, movable1.tappedY)
+
+        deskView.onTouchEvent(makeTouch(193.3f, 100.11000061f, MotionEvent.ACTION_DOWN))
+        deskView.onTouchEvent(makeTouch(193.3f, 100.11000061f, MotionEvent.ACTION_UP))
+        assertEquals(93.3f, movable1.tappedX)
+        assertEquals(0.11000061f, movable1.tappedY)
+    }
+
     private fun makeTouch(x: Float, y: Float, event: Int): MotionEvent {
         if (event == MotionEvent.ACTION_DOWN) {
             motionEventDownTime = SystemClock.uptimeMillis()

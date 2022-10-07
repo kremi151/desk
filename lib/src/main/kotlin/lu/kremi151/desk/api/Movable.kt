@@ -25,6 +25,10 @@ abstract class Movable {
         // No-op by default
     }
 
+    open fun onTapped(x: Float, y: Float) {
+        // No-op by default
+    }
+
     open fun onFocus() {
         // No-op by default
     }

@@ -9,6 +9,8 @@ class TestMovable(
 ): Movable() {
 
     var focused: Boolean = false
+    var tappedX: Float = -1.0f
+    var tappedY: Float = -1.0f
 
     override val width: Float
         get() = mWidth
@@ -26,6 +28,11 @@ class TestMovable(
 
     override fun onBlur() {
         focused = false
+    }
+
+    override fun onTapped(x: Float, y: Float) {
+        tappedX = x
+        tappedY = y
     }
 
     @Suppress("EmptyFunctionBlock")
