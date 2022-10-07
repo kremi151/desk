@@ -3,6 +3,7 @@ package lu.kremi151.desk
 import android.content.Context
 import android.os.SystemClock
 import android.view.MotionEvent
+import lu.kremi151.desk.extensions.assertPos
 import lu.kremi151.desk.util.TestMovable
 import lu.kremi151.desk.view.DeskView
 import org.junit.Assert.assertEquals
@@ -27,10 +28,14 @@ class DeskViewTest {
     private lateinit var movable1: TestMovable
     private lateinit var movable2: TestMovable
 
+    private var motionEventDownTime = 0L
+
     @Before
     fun before() {
         mockContext = RuntimeEnvironment.getApplication()
         deskView = DeskView(mockContext)
+
+        motionEventDownTime = 0L
 
         deskView.right = 800
         deskView.bottom = 1200
@@ -95,10 +100,8 @@ class DeskViewTest {
 
     @Test
     fun testMovingMovable() {
-        assertEquals(100.0f, movable1.x)
-        assertEquals(100.0f, movable1.y)
-        assertEquals(300.0f, movable2.x)
-        assertEquals(300.0f, movable2.y)
+        movable1.assertPos(100.0f, 100.0f)
+        movable2.assertPos(300.0f, 300.0f)
 
         deskView.onTouchEvent(makeTouch(200f, 200f, MotionEvent.ACTION_DOWN))
         deskView.onTouchEvent(makeTouch(210f, 205f, MotionEvent.ACTION_MOVE))
@@ -111,10 +114,8 @@ class DeskViewTest {
         deskView.onTouchEvent(makeTouch(220f, 180f, MotionEvent.ACTION_MOVE))
         deskView.onTouchEvent(makeTouch(220f, 180f, MotionEvent.ACTION_UP))
 
-        assertEquals(120.0f, movable1.x)
-        assertEquals(80.0f, movable1.y)
-        assertEquals(300.0f, movable2.x)
-        assertEquals(300.0f, movable2.y)
+        movable1.assertPos(120.0f, 80.0f)
+        movable2.assertPos(300.0f, 300.0f)
 
         deskView.onTouchEvent(makeTouch(350f, 350f, MotionEvent.ACTION_DOWN))
         deskView.onTouchEvent(makeTouch(340f, 345f, MotionEvent.ACTION_MOVE))
@@ -123,10 +124,8 @@ class DeskViewTest {
         deskView.onTouchEvent(makeTouch(310f, 330f, MotionEvent.ACTION_MOVE))
         deskView.onTouchEvent(makeTouch(310f, 330f, MotionEvent.ACTION_UP))
 
-        assertEquals(120.0f, movable1.x)
-        assertEquals(80.0f, movable1.y)
-        assertEquals(260.0f, movable2.x)
-        assertEquals(280.0f, movable2.y)
+        movable1.assertPos(120.0f, 80.0f)
+        movable2.assertPos(260.0f, 280.0f)
     }
 
     @Test
@@ -135,8 +134,7 @@ class DeskViewTest {
             swipeThreshold = 200,
         )
 
-        assertEquals(100.0f, movable1.x)
-        assertEquals(100.0f, movable1.y)
+        movable1.assertPos(100.0f, 100.0f)
 
         deskView.onTouchEvent(makeTouch(200f, 200f, MotionEvent.ACTION_DOWN))
         ShadowSystemClock.advanceBy(45L, TimeUnit.MILLISECONDS)
@@ -148,8 +146,7 @@ class DeskViewTest {
         ShadowSystemClock.advanceBy(45L, TimeUnit.MILLISECONDS)
         deskView.onTouchEvent(makeTouch(230f, 215f, MotionEvent.ACTION_UP))
 
-        assertEquals(100.0f, movable1.x)
-        assertEquals(100.0f, movable1.y)
+        movable1.assertPos(100.0f, 100.0f)
 
         deskView.onTouchEvent(makeTouch(200f, 200f, MotionEvent.ACTION_DOWN))
         ShadowSystemClock.advanceBy(75L, TimeUnit.MILLISECONDS)
@@ -161,17 +158,21 @@ class DeskViewTest {
         ShadowSystemClock.advanceBy(75L, TimeUnit.MILLISECONDS)
         deskView.onTouchEvent(makeTouch(230f, 215f, MotionEvent.ACTION_UP))
 
-        assertEquals(130.0f, movable1.x)
-        assertEquals(115.0f, movable1.y)
+        movable1.assertPos(130.0f, 115.0f)
     }
 
-    private fun makeTouch(x: Float, y: Float, event: Int) = MotionEvent.obtain(
-        SystemClock.uptimeMillis(),
-        SystemClock.uptimeMillis() + 100L,
-        event,
-        x,
-        y,
-        0,
-    )
+    private fun makeTouch(x: Float, y: Float, event: Int): MotionEvent {
+        if (event == MotionEvent.ACTION_DOWN) {
+            motionEventDownTime = SystemClock.uptimeMillis()
+        }
+        return MotionEvent.obtain(
+            motionEventDownTime,
+            SystemClock.uptimeMillis(),
+            event,
+            x,
+            y,
+            0,
+        )
+    }
 
 }
