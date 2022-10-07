@@ -7,14 +7,12 @@ internal class MovableCollection<MovableT: Movable> {
 
     private val movables = mutableListOf<MovableT>()
     private val listeners = mutableListOf<Listener<MovableT>>()
-    private val idToState = mutableMapOf<UUID, MovableT>()
 
     fun add(movable: MovableT) {
         check(movable.id == null) { "Movable is already bound to a DeskView" }
         val id = UUID.randomUUID()
         synchronized(movables) {
             movables.add(movable)
-            idToState[id] = movable.also { it.id = id }
         }
         synchronized(listeners) {
             listeners.forEach {
@@ -24,13 +22,11 @@ internal class MovableCollection<MovableT: Movable> {
     }
 
     fun remove(movable: MovableT): Boolean {
-        val toRemove = movable.id?.let { id ->
-            idToState.remove(id)
-        } ?: return false
         val removed = synchronized(movables) {
-            movables.remove(toRemove.also { it.id = null })
+            movables.remove(movable)
         }
         if (removed) {
+            movable.id = null
             synchronized(listeners) {
                 listeners.forEach {
                     it.onChanged(this)
