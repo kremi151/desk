@@ -139,25 +139,29 @@ class DeskViewTest {
         deskView.onTouchEvent(makeTouch(200f, 200f, MotionEvent.ACTION_DOWN))
         ShadowSystemClock.advanceBy(45L, TimeUnit.MILLISECONDS)
         deskView.onTouchEvent(makeTouch(210f, 205f, MotionEvent.ACTION_MOVE))
+        movable1.assertPos(100.0f, 100.0f)
         ShadowSystemClock.advanceBy(45L, TimeUnit.MILLISECONDS)
         deskView.onTouchEvent(makeTouch(220f, 210f, MotionEvent.ACTION_MOVE))
+        movable1.assertPos(100.0f, 100.0f)
         ShadowSystemClock.advanceBy(45L, TimeUnit.MILLISECONDS)
         deskView.onTouchEvent(makeTouch(230f, 215f, MotionEvent.ACTION_MOVE))
+        movable1.assertPos(100.0f, 100.0f)
         ShadowSystemClock.advanceBy(45L, TimeUnit.MILLISECONDS)
         deskView.onTouchEvent(makeTouch(230f, 215f, MotionEvent.ACTION_UP))
-
         movable1.assertPos(100.0f, 100.0f)
 
         deskView.onTouchEvent(makeTouch(200f, 200f, MotionEvent.ACTION_DOWN))
         ShadowSystemClock.advanceBy(75L, TimeUnit.MILLISECONDS)
         deskView.onTouchEvent(makeTouch(210f, 205f, MotionEvent.ACTION_MOVE))
+        movable1.assertPos(100.0f, 100.0f)
         ShadowSystemClock.advanceBy(75L, TimeUnit.MILLISECONDS)
         deskView.onTouchEvent(makeTouch(220f, 210f, MotionEvent.ACTION_MOVE))
+        movable1.assertPos(100.0f, 100.0f)
         ShadowSystemClock.advanceBy(75L, TimeUnit.MILLISECONDS)
         deskView.onTouchEvent(makeTouch(230f, 215f, MotionEvent.ACTION_MOVE))
+        movable1.assertPos(130.0f, 115.0f)
         ShadowSystemClock.advanceBy(75L, TimeUnit.MILLISECONDS)
         deskView.onTouchEvent(makeTouch(230f, 215f, MotionEvent.ACTION_UP))
-
         movable1.assertPos(130.0f, 115.0f)
     }
 
