@@ -143,15 +143,17 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
 
             activeMovable.x += (oldWidth - newWidth) / 2f
             activeMovable.y += (oldHeight - newHeight) / 2f
-            if (activeMovable.x + newWidth > mWidth) {
-                activeMovable.x = mWidth - activeMovable.width
-            } else if (activeMovable.x < 0.0f) {
-                activeMovable.x = 0.0f
-            }
-            if (activeMovable.y + newHeight > mHeight) {
-                activeMovable.y = mHeight - activeMovable.height
-            } else if (activeMovable.y < 0.0f) {
-                activeMovable.y = 0.0f
+            if (config.containMovables) {
+                if (activeMovable.x + newWidth > mWidth) {
+                    activeMovable.x = mWidth - activeMovable.width
+                } else if (activeMovable.x < 0.0f) {
+                    activeMovable.x = 0.0f
+                }
+                if (activeMovable.y + newHeight > mHeight) {
+                    activeMovable.y = mHeight - activeMovable.height
+                } else if (activeMovable.y < 0.0f) {
+                    activeMovable.y = 0.0f
+                }
             }
 
             invalidate()
