@@ -29,7 +29,8 @@ class MainActivity : AppCompatActivity() {
             )
             deskView.addMovable(
                 movable = AspectRatioKeepingMovable(
-                    color = Color.parseColor("#00ff50"),
+                    focusedColor = Color.parseColor("#00ff50"),
+                    unfocusedColor = Color.parseColor("#ff0050"),
                     aspectRatio = 1.5f,
                     height = 400.0f,
                 ),

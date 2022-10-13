@@ -7,12 +7,13 @@ import lu.kremi151.desk.api.Movable
 import kotlin.math.min
 
 class AspectRatioKeepingMovable(
-    color: Int,
+    private val unfocusedColor: Int,
+    private val focusedColor: Int,
     private val aspectRatio: Float,
     height: Float,
 ): Movable() {
     private val paint = Paint().apply {
-        this.color = color
+        this.color = unfocusedColor
         style = Paint.Style.STROKE
         strokeWidth = 10.0f
         textSize = 26.0f
@@ -42,6 +43,14 @@ class AspectRatioKeepingMovable(
         val text = "Aspect ratio: $aspectRatio"
         val textWidth = paint.measureText(text)
         canvas.drawText(text, width - textWidth - 18.0f, height - 26.0f, paint)
+    }
+
+    override fun onFocus() {
+        paint.color = focusedColor
+    }
+
+    override fun onBlur() {
+        paint.color = unfocusedColor
     }
 
 }
