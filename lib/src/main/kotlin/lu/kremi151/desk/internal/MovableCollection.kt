@@ -10,9 +10,8 @@ internal class MovableCollection<MovableT: Movable> {
 
     fun add(movable: MovableT) {
         check(movable.id == null) { "Movable is already bound to a DeskView" }
-        val id = UUID.randomUUID()
         synchronized(movables) {
-            movables.add(movable)
+            movables.add(movable.also { it.id = UUID.randomUUID() })
         }
         synchronized(listeners) {
             listeners.forEach {
