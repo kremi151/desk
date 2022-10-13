@@ -312,6 +312,10 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         return movables.remove(movable)
     }
 
+    fun removeMovables(predicate: (MovableT) -> Boolean): Int {
+        return movables.removeIf(predicate)
+    }
+
     fun addOverlay(overlay: DeskViewOverlay) {
         overlays.add(overlay)
     }

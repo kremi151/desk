@@ -35,6 +35,21 @@ internal class MovableCollection<MovableT: Movable> {
         return removed
     }
 
+    fun removeIf(predicate: (MovableT) -> Boolean): Int {
+        var counter = 0
+        synchronized(movables) {
+            val it = movables.iterator()
+            while (it.hasNext()) {
+                val m = it.next()
+                if (predicate(m)) {
+                    it.remove()
+                    counter++
+                }
+            }
+        }
+        return counter
+    }
+
     fun forEach(action: (MovableT) -> Unit) {
         synchronized(movables) {
             movables.forEach(action)
