@@ -27,13 +27,20 @@ class DeskViewTest {
     private lateinit var movable2: TestMovable
 
     private var motionEventDownTime = 0L
+    private var invalidates = 0
 
     @Before
     fun before() {
         mockContext = RuntimeEnvironment.getApplication()
-        deskView = DeskView(mockContext)
+        deskView = object : DeskView(mockContext) {
+            override fun invalidate() {
+                super.invalidate()
+                invalidates++
+            }
+        }
 
         motionEventDownTime = 0L
+        invalidates = 0
 
         deskView.right = 800
         deskView.bottom = 1200
@@ -70,36 +77,45 @@ class DeskViewTest {
         assertNull(deskView.focusedMovable)
         assertEquals(0, movable1.focusedCounter)
         assertEquals(0, movable2.focusedCounter)
+        assertEquals(0, invalidates)
 
         deskView.onTouchEvent(makeTouch(99.9f, 99.9f, MotionEvent.ACTION_DOWN))
+        assertEquals(0, invalidates)
         deskView.onTouchEvent(makeTouch(99.9f, 99.9f, MotionEvent.ACTION_UP))
         assertNull(deskView.focusedMovable)
         assertEquals(0, movable1.focusedCounter)
         assertEquals(0, movable2.focusedCounter)
 
         deskView.onTouchEvent(makeTouch(200f, 200f, MotionEvent.ACTION_DOWN))
+        assertEquals(1, invalidates)
         deskView.onTouchEvent(makeTouch(200f, 200f, MotionEvent.ACTION_UP))
         assertEquals(movable1, deskView.focusedMovable)
         assertEquals(1, movable1.focusedCounter)
         assertEquals(0, movable2.focusedCounter)
 
         deskView.onTouchEvent(makeTouch(400f, 400f, MotionEvent.ACTION_DOWN))
+        assertEquals(2, invalidates)
         deskView.onTouchEvent(makeTouch(400f, 400f, MotionEvent.ACTION_UP))
         assertEquals(movable2, deskView.focusedMovable)
-        assertEquals(0, movable1.focusedCounter)
+        assertEquals(0, movable1.focusedCounter) //
         assertEquals(1, movable2.focusedCounter)
 
         deskView.onTouchEvent(makeTouch(450f, 450f, MotionEvent.ACTION_DOWN))
+        assertEquals(3, invalidates)
         deskView.onTouchEvent(makeTouch(450f, 450f, MotionEvent.ACTION_UP))
         assertEquals(movable2, deskView.focusedMovable)
         assertEquals(0, movable1.focusedCounter)
         assertEquals(1, movable2.focusedCounter)
 
         deskView.onTouchEvent(makeTouch(700.1f, 700.1f, MotionEvent.ACTION_DOWN))
+        assertEquals(4, invalidates)
         deskView.onTouchEvent(makeTouch(700.1f, 700.1f, MotionEvent.ACTION_UP))
         assertNull(deskView.focusedMovable)
         assertEquals(0, movable1.focusedCounter)
         assertEquals(0, movable2.focusedCounter)
+
+        deskView.onTouchEvent(makeTouch(750f, 750f, MotionEvent.ACTION_DOWN))
+        assertEquals(4, invalidates)
     }
 
     @Test

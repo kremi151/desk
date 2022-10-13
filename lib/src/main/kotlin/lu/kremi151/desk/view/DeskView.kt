@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import lu.kremi151.desk.api.Movable
 
-class DeskView @JvmOverloads constructor(
+open class DeskView @JvmOverloads constructor(
     context: Context, attrs:
     AttributeSet? = null,
     defStyleAttr: Int = 0,
