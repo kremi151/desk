@@ -174,7 +174,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
             return true
         }
 
-        when (event.action) {
+        when (event.action and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_DOWN -> handleActionDown(event)
             MotionEvent.ACTION_MOVE -> handleActionMove(event)
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> handleActionUpOrCancel()
