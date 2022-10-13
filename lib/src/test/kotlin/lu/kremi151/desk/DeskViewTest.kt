@@ -198,6 +198,19 @@ class DeskViewTest {
         assertEquals(0.11000061f, movable1.tappedY)
     }
 
+    @Test
+    fun testInitialOnMovedCalled() {
+        val movable = TestMovable(420f, 420f)
+        deskView.addMovable(
+            movable = movable,
+            x = 123.0f,
+            y = 386.0f,
+        )
+
+        assertEquals(123.0f, movable.movedX)
+        assertEquals(386.0f, movable.movedY)
+    }
+
     private fun makeTouch(x: Float, y: Float, event: Int): MotionEvent {
         if (event == MotionEvent.ACTION_DOWN) {
             motionEventDownTime = SystemClock.uptimeMillis()
