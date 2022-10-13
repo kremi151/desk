@@ -303,6 +303,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         movables.add(movable.apply {
             this.x = x
             this.y = y
+            onMoved(x, y)
         })
     }
 
