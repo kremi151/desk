@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Color
 import android.os.SystemClock
 import android.util.AttributeSet
+import android.util.Size
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.SurfaceHolder
@@ -41,6 +42,9 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         }
 
         override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+            mWidth = width
+            mHeight = height
+            thread?.surfaceSize = Size(width, height)
             invalidate()
         }
 
@@ -272,12 +276,6 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         }
     }
 
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
-        mWidth = w
-        mHeight = h
-    }
-
     private fun moveContained(movable: MovableT, newX: Float, newY: Float) {
         movable.x = if (newX < 0.0f) {
             0.0f
@@ -336,6 +334,8 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         thread = DeskViewThread(
             surfaceHolder = holder,
             movables = movables,
+            initialWidth = mWidth,
+            initialHeight = mHeight,
             config = config,
         ).also {
             it.start()

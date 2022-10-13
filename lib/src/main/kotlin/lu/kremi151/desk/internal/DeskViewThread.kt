@@ -3,15 +3,20 @@ package lu.kremi151.desk.internal
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.util.Size
 import android.view.SurfaceHolder
 import lu.kremi151.desk.BuildConfig
+import lu.kremi151.desk.api.DeskViewOverlay
 import lu.kremi151.desk.api.Movable
 import lu.kremi151.desk.config.DeskViewConfig
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.Semaphore
 
 internal class DeskViewThread<MovableT : Movable>(
     private val surfaceHolder: SurfaceHolder,
     private val movables: MovableCollection<MovableT>,
+    initialWidth: Int,
+    initialHeight: Int,
     config: DeskViewConfig,
 ): Thread("DeskView thread") {
 
@@ -22,7 +27,12 @@ internal class DeskViewThread<MovableT : Movable>(
     @Volatile
     private var running = true
 
+    @Volatile
+    var surfaceSize = Size(initialWidth, initialHeight)
+
     private val s = Semaphore(0)
+
+    val overlays = CopyOnWriteArrayList<DeskViewOverlay>()
 
     var config: DeskViewConfig = config
         set(value) {
@@ -74,6 +84,11 @@ internal class DeskViewThread<MovableT : Movable>(
             canvas.translate(it.x, it.y)
             it.draw(canvas)
             canvas.restore()
+        }
+        overlays.forEach {
+            with(surfaceSize) {
+                it.drawOverlay(canvas, width, height)
+            }
         }
     }
 
