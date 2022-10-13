@@ -185,6 +185,8 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
 
     private fun handleActionDown(event: MotionEvent) {
         mTouchStarted = SystemClock.uptimeMillis()
+        var shouldInvalidate = false
+
         event.actionIndex.also { pointerIndex ->
             // Remember where we started (for dragging)
             mLastTouchX = event.getX(pointerIndex)
@@ -194,6 +196,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
             val activeMovable = findMovableByPos(mLastTouchX, mLastTouchY)
             if (currentActiveMovable != null && activeMovable?.id != currentActiveMovable.id) {
                 currentActiveMovable.onBlur()
+                shouldInvalidate = true
             }
             if (activeMovable != null) {
                 mInitialPosX = activeMovable.x
@@ -202,8 +205,13 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
                     activeMovable.onFocus()
                 }
                 activeMovable.onTapped(mLastTouchX - mInitialPosX, mLastTouchY - mInitialPosY)
+                shouldInvalidate = true
             }
             mActiveMovable = activeMovable
+        }
+
+        if (shouldInvalidate) {
+            invalidate()
         }
 
         // Save the ID of this pointer (for dragging)
