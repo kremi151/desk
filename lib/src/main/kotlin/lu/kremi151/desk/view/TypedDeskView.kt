@@ -11,10 +11,12 @@ import android.view.ScaleGestureDetector
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import lu.kremi151.desk.R
+import lu.kremi151.desk.api.DeskViewOverlay
 import lu.kremi151.desk.api.Movable
 import lu.kremi151.desk.config.DeskViewConfig
 import lu.kremi151.desk.internal.DeskViewThread
 import lu.kremi151.desk.internal.MovableCollection
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.math.max
 import kotlin.math.min
 
@@ -34,6 +36,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
 
     private var thread: DeskViewThread<MovableT>? = null
     private val movables = MovableCollection<MovableT>()
+    private val overlays = CopyOnWriteArrayList<DeskViewOverlay>()
 
     private val surfaceHolderCallback = object : SurfaceHolder.Callback2 {
 
@@ -309,6 +312,14 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         return movables.remove(movable)
     }
 
+    fun addOverlay(overlay: DeskViewOverlay) {
+        overlays.add(overlay)
+    }
+
+    fun removeOverlay(overlay: DeskViewOverlay): Boolean {
+        return overlays.remove(overlay)
+    }
+
     fun moveToForeground(movable: MovableT, entirely: Boolean = false) {
         if (movables.moveToForeground(movable, entirely)) {
             invalidate()
@@ -334,6 +345,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         thread = DeskViewThread(
             surfaceHolder = holder,
             movables = movables,
+            overlays = overlays,
             initialWidth = mWidth,
             initialHeight = mHeight,
             config = config,

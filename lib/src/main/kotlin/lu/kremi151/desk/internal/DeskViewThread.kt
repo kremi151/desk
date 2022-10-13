@@ -15,6 +15,7 @@ import java.util.concurrent.Semaphore
 internal class DeskViewThread<MovableT : Movable>(
     private val surfaceHolder: SurfaceHolder,
     private val movables: MovableCollection<MovableT>,
+    private val overlays: CopyOnWriteArrayList<DeskViewOverlay>,
     initialWidth: Int,
     initialHeight: Int,
     config: DeskViewConfig,
@@ -31,8 +32,6 @@ internal class DeskViewThread<MovableT : Movable>(
     var surfaceSize = Size(initialWidth, initialHeight)
 
     private val s = Semaphore(0)
-
-    val overlays = CopyOnWriteArrayList<DeskViewOverlay>()
 
     var config: DeskViewConfig = config
         set(value) {
