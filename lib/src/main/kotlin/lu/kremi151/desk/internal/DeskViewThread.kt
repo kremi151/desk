@@ -6,7 +6,7 @@ import android.graphics.Paint
 import android.util.Size
 import android.view.SurfaceHolder
 import lu.kremi151.desk.BuildConfig
-import lu.kremi151.desk.api.DeskViewOverlay
+import lu.kremi151.desk.api.DeskViewLayer
 import lu.kremi151.desk.api.Movable
 import lu.kremi151.desk.config.DeskViewConfig
 import java.util.concurrent.CopyOnWriteArrayList
@@ -15,7 +15,8 @@ import java.util.concurrent.Semaphore
 internal class DeskViewThread<MovableT : Movable>(
     private val surfaceHolder: SurfaceHolder,
     private val movables: MovableCollection<MovableT>,
-    private val overlays: CopyOnWriteArrayList<DeskViewOverlay>,
+    private val underlays: CopyOnWriteArrayList<DeskViewLayer>,
+    private val overlays: CopyOnWriteArrayList<DeskViewLayer>,
     initialWidth: Int,
     initialHeight: Int,
     config: DeskViewConfig,
@@ -71,10 +72,17 @@ internal class DeskViewThread<MovableT : Movable>(
 
         canvas.drawColor(config.backgroundColor)
 
+        preDraw(canvas)
         draw(canvas)
         postDraw(canvas)
 
         surfaceHolder.unlockCanvasAndPost(canvas)
+    }
+
+    private fun preDraw(canvas: Canvas) {
+        underlays.forEach {
+            it.draw(canvas)
+        }
     }
 
     private fun draw(canvas: Canvas) {
@@ -84,14 +92,12 @@ internal class DeskViewThread<MovableT : Movable>(
             it.draw(canvas)
             canvas.restore()
         }
-        overlays.forEach {
-            with(surfaceSize) {
-                it.drawOverlay(canvas, width, height)
-            }
-        }
     }
 
     private fun postDraw(canvas: Canvas) {
+        overlays.forEach {
+            it.draw(canvas)
+        }
         if (BuildConfig.DEBUG && config.debugMode) {
             val paint = Paint().apply {
                 color = Color.BLACK

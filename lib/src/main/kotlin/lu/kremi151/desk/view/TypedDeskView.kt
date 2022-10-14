@@ -11,7 +11,7 @@ import android.view.ScaleGestureDetector
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import lu.kremi151.desk.R
-import lu.kremi151.desk.api.DeskViewOverlay
+import lu.kremi151.desk.api.DeskViewLayer
 import lu.kremi151.desk.api.Movable
 import lu.kremi151.desk.config.DeskViewConfig
 import lu.kremi151.desk.internal.DeskViewThread
@@ -36,7 +36,8 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
 
     private var thread: DeskViewThread<MovableT>? = null
     private val movables = MovableCollection<MovableT>()
-    private val overlays = CopyOnWriteArrayList<DeskViewOverlay>()
+    private val underlays = CopyOnWriteArrayList<DeskViewLayer>()
+    private val overlays = CopyOnWriteArrayList<DeskViewLayer>()
 
     private val surfaceHolderCallback = object : SurfaceHolder.Callback2 {
 
@@ -48,6 +49,10 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
             mWidth = width
             mHeight = height
             thread?.surfaceSize = Size(width, height)
+
+            underlays.forEach { it.onSizeChanged(width, height) }
+            overlays.forEach { it.onSizeChanged(width, height) }
+
             invalidate()
         }
 
@@ -316,11 +321,21 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         return movables.removeIf(predicate)
     }
 
-    fun addOverlay(overlay: DeskViewOverlay) {
+    fun addUnderlay(underlay: DeskViewLayer) {
+        underlay.onSizeChanged(mWidth, mHeight)
+        underlays.add(underlay)
+    }
+
+    fun removeUnderlay(underlay: DeskViewLayer): Boolean {
+        return underlays.remove(underlay)
+    }
+
+    fun addOverlay(overlay: DeskViewLayer) {
+        overlay.onSizeChanged(mWidth, mHeight)
         overlays.add(overlay)
     }
 
-    fun removeOverlay(overlay: DeskViewOverlay): Boolean {
+    fun removeOverlay(overlay: DeskViewLayer): Boolean {
         return overlays.remove(overlay)
     }
 
@@ -349,6 +364,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         thread = DeskViewThread(
             surfaceHolder = holder,
             movables = movables,
+            underlays = underlays,
             overlays = overlays,
             initialWidth = mWidth,
             initialHeight = mHeight,
