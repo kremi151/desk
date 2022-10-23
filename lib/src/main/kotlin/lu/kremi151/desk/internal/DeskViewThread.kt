@@ -7,6 +7,7 @@ import android.util.Size
 import android.view.SurfaceHolder
 import lu.kremi151.desk.BuildConfig
 import lu.kremi151.desk.api.DeskViewLayer
+import lu.kremi151.desk.api.Format
 import lu.kremi151.desk.api.Movable
 import lu.kremi151.desk.config.DeskViewConfig
 import java.util.concurrent.CopyOnWriteArrayList
@@ -35,6 +36,12 @@ internal class DeskViewThread<MovableT : Movable>(
     private val s = Semaphore(0)
 
     var config: DeskViewConfig = config
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    var format: Format = DefaultFormat
         set(value) {
             field = value
             invalidate()
@@ -88,7 +95,9 @@ internal class DeskViewThread<MovableT : Movable>(
     private fun draw(canvas: Canvas) {
         movables.forEach {
             canvas.save()
-            canvas.translate(it.x, it.y)
+            with(format) {
+                canvas.translate(toViewPixels(it.x), toViewPixels(it.y))
+            }
             it.draw(canvas)
             canvas.restore()
         }

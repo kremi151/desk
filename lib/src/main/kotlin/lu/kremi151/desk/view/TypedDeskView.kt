@@ -12,8 +12,10 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import lu.kremi151.desk.R
 import lu.kremi151.desk.api.DeskViewLayer
+import lu.kremi151.desk.api.Format
 import lu.kremi151.desk.api.Movable
 import lu.kremi151.desk.config.DeskViewConfig
+import lu.kremi151.desk.internal.DefaultFormat
 import lu.kremi151.desk.internal.DeskViewThread
 import lu.kremi151.desk.internal.MovableCollection
 import java.util.concurrent.CopyOnWriteArrayList
@@ -38,6 +40,14 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
     private val movables = MovableCollection<MovableT>()
     private val underlays = CopyOnWriteArrayList<DeskViewLayer>()
     private val overlays = CopyOnWriteArrayList<DeskViewLayer>()
+    private var format: Format = DefaultFormat
+        set(value) {
+            if (mWidth > 0 && mHeight > 0) {
+                value.onLayoutChanged(mWidth.toFloat(), mHeight.toFloat())
+            }
+            field = value
+            thread?.format = format
+        }
 
     private val surfaceHolderCallback = object : SurfaceHolder.Callback2 {
 
@@ -52,6 +62,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
 
             underlays.forEach { it.onSizeChanged(width, height) }
             overlays.forEach { it.onSizeChanged(width, height) }
+            this@TypedDeskView.format.onLayoutChanged(width.toFloat(), height.toFloat())
 
             invalidate()
         }
@@ -112,13 +123,17 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         thread?.invalidate()
     }
 
-    private fun findMovableByPos(x: Float, y: Float): MovableT? = movables.findLast { m ->
-        m.x <= x && m.y <= y && m.x + m.width >= x && m.y + m.height >= y
+    private fun findMovableByViewPos(x: Float, y: Float): MovableT? = with(format) {
+        val formatX = fromViewPixels(x)
+        val formatY = fromViewPixels(y)
+        movables.findLast { m ->
+            m.x <= formatX && m.y <= formatY && m.x + m.width >= formatX && m.y + m.height >= formatY
+        }
     }
 
     private val scaleListener = object : ScaleGestureDetector.OnScaleGestureListener {
         override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
-            val movable = findMovableByPos(detector.focusX, detector.focusY)
+            val movable = findMovableByViewPos(detector.focusX, detector.focusY)
             mActiveMovable = movable
             return movable != null
         }
@@ -205,18 +220,23 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
             mLastTouchY = event.getY(pointerIndex)
 
             val currentActiveMovable = mActiveMovable
-            val activeMovable = findMovableByPos(mLastTouchX, mLastTouchY)
+            val activeMovable = findMovableByViewPos(mLastTouchX, mLastTouchY)
             if (currentActiveMovable != null && activeMovable?.id != currentActiveMovable.id) {
                 currentActiveMovable.onBlur()
                 shouldInvalidate = true
             }
             if (activeMovable != null) {
-                mInitialPosX = activeMovable.x
-                mInitialPosY = activeMovable.y
-                if (currentActiveMovable == null || activeMovable.id != currentActiveMovable.id) {
-                    activeMovable.onFocus()
+                with(format) {
+                    mInitialPosX = toViewPixels(activeMovable.x)
+                    mInitialPosY = toViewPixels(activeMovable.y)
+                    if (currentActiveMovable == null || activeMovable.id != currentActiveMovable.id) {
+                        activeMovable.onFocus()
+                    }
+                    activeMovable.onTapped(
+                        fromViewPixels(mLastTouchX - mInitialPosX),
+                        fromViewPixels(mLastTouchY - mInitialPosY),
+                    )
                 }
-                activeMovable.onTapped(mLastTouchX - mInitialPosX, mLastTouchY - mInitialPosY)
                 shouldInvalidate = true
             }
             mActiveMovable = activeMovable
@@ -244,16 +264,18 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
 
         val activeMovable = mActiveMovable
         if (activeMovable?.locked == false) {
-            val newX = activeMovable.x + x - mLastTouchX
-            val newY = activeMovable.y + y - mLastTouchY
+            with(format) {
+                val newX = toViewPixels(activeMovable.x) + x - mLastTouchX
+                val newY = toViewPixels(activeMovable.y) + y - mLastTouchY
 
-            if (config.containMovables) {
-                moveContained(activeMovable, newX, newY)
-            } else {
-                activeMovable.x = newX
-                activeMovable.y = newY
+                if (config.containMovables) {
+                    moveContained(activeMovable, newX, newY)
+                } else {
+                    activeMovable.x = fromViewPixels(newX)
+                    activeMovable.y = fromViewPixels(newY)
+                }
+                invalidate()
             }
-            invalidate()
         }
 
         // Remember this touch position for the next move event
@@ -284,21 +306,23 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         }
     }
 
-    private fun moveContained(movable: MovableT, newX: Float, newY: Float) {
-        movable.x = if (newX < 0.0f) {
-            0.0f
-        } else if (newX > mWidth - movable.width) {
-            mWidth - movable.width
-        } else {
-            newX
-        }
+    private fun moveContained(movable: MovableT, newViewX: Float, newViewY: Float) {
+        with(format) {
+            movable.x = fromViewPixels(if (newViewX < 0.0f) {
+                0.0f
+            } else if (newViewX > mWidth - movable.width) {
+                mWidth - movable.width
+            } else {
+                newViewX
+            })
 
-        movable.y = if (newY < 0.0f) {
-            0.0f
-        } else if (newY > mHeight - movable.height) {
-            mHeight - movable.height
-        } else {
-            newY
+            movable.y = fromViewPixels(if (newViewY < 0.0f) {
+                0.0f
+            } else if (newViewY > mHeight - movable.height) {
+                mHeight - movable.height
+            } else {
+                newViewY
+            })
         }
     }
 
@@ -370,6 +394,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
             initialHeight = mHeight,
             config = config,
         ).also {
+            it.format = format
             it.start()
         }
     }
