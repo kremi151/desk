@@ -40,13 +40,15 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
     private val movables = MovableCollection<MovableT>()
     private val underlays = CopyOnWriteArrayList<DeskViewLayer>()
     private val overlays = CopyOnWriteArrayList<DeskViewLayer>()
-    private var format: Format = DefaultFormat
+
+    var format: Format = DefaultFormat
         set(value) {
             if (mWidth > 0 && mHeight > 0) {
                 value.onLayoutChanged(mWidth.toFloat(), mHeight.toFloat())
             }
             field = value
             thread?.format = format
+            invalidate()
         }
 
     private val surfaceHolderCallback = object : SurfaceHolder.Callback2 {
