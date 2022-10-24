@@ -15,7 +15,6 @@ import lu.kremi151.desk.api.DeskViewLayer
 import lu.kremi151.desk.api.Format
 import lu.kremi151.desk.api.Movable
 import lu.kremi151.desk.config.DeskViewConfig
-import lu.kremi151.desk.internal.DefaultFormat
 import lu.kremi151.desk.internal.DeskViewThread
 import lu.kremi151.desk.internal.MovableCollection
 import java.util.concurrent.CopyOnWriteArrayList
@@ -41,7 +40,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
     private val underlays = CopyOnWriteArrayList<DeskViewLayer>()
     private val overlays = CopyOnWriteArrayList<DeskViewLayer>()
 
-    var format: Format = DefaultFormat
+    var format: Format = Format.DEFAULT
         set(value) {
             if (mWidth > 0 && mHeight > 0) {
                 value.onLayoutChanged(mWidth.toFloat(), mHeight.toFloat())
