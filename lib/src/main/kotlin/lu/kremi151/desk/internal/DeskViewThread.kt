@@ -93,14 +93,17 @@ internal class DeskViewThread<MovableT : Movable>(
     }
 
     private fun draw(canvas: Canvas) {
-        movables.forEach {
-            canvas.save()
-            with(format) {
+        canvas.save()
+        with(format) {
+            fromViewPixels(1.0f).let { s -> canvas.scale(s, s) }
+            movables.forEach {
+                canvas.save()
                 canvas.translate(toViewPixels(it.x), toViewPixels(it.y))
+                it.draw(canvas)
+                canvas.restore()
             }
-            it.draw(canvas)
-            canvas.restore()
         }
+        canvas.restore()
     }
 
     private fun postDraw(canvas: Canvas) {
