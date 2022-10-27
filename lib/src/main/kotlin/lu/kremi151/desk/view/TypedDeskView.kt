@@ -153,11 +153,15 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
             var newHeight = oldHeight * scaleFactor
 
             if (config.containMovables) {
-                if (newWidth > mWidth) {
-                    newWidth = mWidth.toFloat()
-                }
-                if (newHeight > mHeight) {
-                    newHeight = mHeight.toFloat()
+                with(format) {
+                    val vWidth = fromViewPixels(mWidth.toFloat())
+                    val vHeight = fromViewPixels(mHeight.toFloat())
+                    if (newWidth > vWidth) {
+                        newWidth = vWidth
+                    }
+                    if (newHeight > vHeight) {
+                        newHeight = vHeight
+                    }
                 }
             }
 
@@ -172,15 +176,19 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
             activeMovable.x += (oldWidth - newWidth) / 2f
             activeMovable.y += (oldHeight - newHeight) / 2f
             if (config.containMovables) {
-                if (activeMovable.x + newWidth > mWidth) {
-                    activeMovable.x = mWidth - activeMovable.width
-                } else if (activeMovable.x < 0.0f) {
-                    activeMovable.x = 0.0f
-                }
-                if (activeMovable.y + newHeight > mHeight) {
-                    activeMovable.y = mHeight - activeMovable.height
-                } else if (activeMovable.y < 0.0f) {
-                    activeMovable.y = 0.0f
+                with(format) {
+                    val vWidth = fromViewPixels(mWidth.toFloat())
+                    val vHeight = fromViewPixels(mHeight.toFloat())
+                    if (activeMovable.x + newWidth > vWidth) {
+                        activeMovable.x = vWidth - activeMovable.width
+                    } else if (activeMovable.x < 0.0f) {
+                        activeMovable.x = 0.0f
+                    }
+                    if (activeMovable.y + newHeight > vHeight) {
+                        activeMovable.y = vHeight - activeMovable.height
+                    } else if (activeMovable.y < 0.0f) {
+                        activeMovable.y = 0.0f
+                    }
                 }
             }
 
@@ -309,21 +317,26 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
 
     private fun moveContained(movable: MovableT, newViewX: Float, newViewY: Float) {
         with(format) {
-            movable.x = fromViewPixels(if (newViewX < 0.0f) {
-                0.0f
-            } else if (newViewX > mWidth - movable.width) {
-                mWidth - movable.width
-            } else {
-                newViewX
-            })
+            val newX = fromViewPixels(newViewX)
+            val newY = fromViewPixels(newViewY)
+            val vWidth = fromViewPixels(mWidth.toFloat())
+            val vHeight = fromViewPixels(mHeight.toFloat())
 
-            movable.y = fromViewPixels(if (newViewY < 0.0f) {
+            movable.x = if (newX < 0.0f) {
                 0.0f
-            } else if (newViewY > mHeight - movable.height) {
-                mHeight - movable.height
+            } else if (newX > vWidth - movable.width) {
+                vWidth - movable.width
             } else {
-                newViewY
-            })
+                newX
+            }
+
+            movable.y = if (newY < 0.0f) {
+                0.0f
+            } else if (newY > vHeight - movable.height) {
+                vHeight - movable.height
+            } else {
+                newY
+            }
         }
     }
 
