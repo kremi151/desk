@@ -359,6 +359,10 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         return movables.removeIf(predicate)
     }
 
+    fun forEachMovable(block: (MovableT) -> Unit) {
+        movables.forEach(block)
+    }
+
     fun addUnderlay(underlay: DeskViewLayer) {
         underlay.onSizeChanged(mWidth, mHeight)
         underlays.add(underlay)
