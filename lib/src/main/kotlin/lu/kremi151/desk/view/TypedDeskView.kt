@@ -165,29 +165,31 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
                 }
             }
 
-            activeMovable.remeasure(newWidth, newHeight)
-            with(activeMovable) {
-                check(width <= newWidth) { "New width $width must not be larger than available $newWidth" }
-                check(height <= newHeight) { "New height $height must not be larger than available $newHeight" }
-                newWidth = width
-                newHeight = height
-            }
+            synchronized(activeMovable) {
+                with(activeMovable) {
+                    remeasure(newWidth, newHeight)
+                    check(width <= newWidth) { "New width $width must not be larger than available $newWidth" }
+                    check(height <= newHeight) { "New height $height must not be larger than available $newHeight" }
+                    newWidth = width
+                    newHeight = height
+                }
 
-            activeMovable.x += (oldWidth - newWidth) / 2f
-            activeMovable.y += (oldHeight - newHeight) / 2f
-            if (config.containMovables) {
-                with(format) {
-                    val vWidth = fromViewPixels(mWidth.toFloat())
-                    val vHeight = fromViewPixels(mHeight.toFloat())
-                    if (activeMovable.x + newWidth > vWidth) {
-                        activeMovable.x = vWidth - activeMovable.width
-                    } else if (activeMovable.x < 0.0f) {
-                        activeMovable.x = 0.0f
-                    }
-                    if (activeMovable.y + newHeight > vHeight) {
-                        activeMovable.y = vHeight - activeMovable.height
-                    } else if (activeMovable.y < 0.0f) {
-                        activeMovable.y = 0.0f
+                activeMovable.x += (oldWidth - newWidth) / 2f
+                activeMovable.y += (oldHeight - newHeight) / 2f
+                if (config.containMovables) {
+                    with(format) {
+                        val vWidth = fromViewPixels(mWidth.toFloat())
+                        val vHeight = fromViewPixels(mHeight.toFloat())
+                        if (activeMovable.x + newWidth > vWidth) {
+                            activeMovable.x = vWidth - activeMovable.width
+                        } else if (activeMovable.x < 0.0f) {
+                            activeMovable.x = 0.0f
+                        }
+                        if (activeMovable.y + newHeight > vHeight) {
+                            activeMovable.y = vHeight - activeMovable.height
+                        } else if (activeMovable.y < 0.0f) {
+                            activeMovable.y = 0.0f
+                        }
                     }
                 }
             }
@@ -273,18 +275,20 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
 
         val activeMovable = mActiveMovable
         if (activeMovable?.locked == false) {
-            with(format) {
-                val newX = toViewPixels(activeMovable.x) + x - mLastTouchX
-                val newY = toViewPixels(activeMovable.y) + y - mLastTouchY
+            synchronized(activeMovable) {
+                with(format) {
+                    val newX = toViewPixels(activeMovable.x) + x - mLastTouchX
+                    val newY = toViewPixels(activeMovable.y) + y - mLastTouchY
 
-                if (config.containMovables) {
-                    moveContained(activeMovable, newX, newY)
-                } else {
-                    activeMovable.x = fromViewPixels(newX)
-                    activeMovable.y = fromViewPixels(newY)
+                    if (config.containMovables) {
+                        moveContained(activeMovable, newX, newY)
+                    } else {
+                        activeMovable.x = fromViewPixels(newX)
+                        activeMovable.y = fromViewPixels(newY)
+                    }
                 }
-                invalidate()
             }
+            invalidate()
         }
 
         // Remember this touch position for the next move event
