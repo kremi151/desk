@@ -126,8 +126,8 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
 
     private fun findMovableByViewPos(x: Float, y: Float): MovableT? = with(format) {
         val translation = config.translation
-        val formatX = fromViewPixels(x) + translation.x
-        val formatY = fromViewPixels(y) + translation.y
+        val formatX = fromViewPixels(x) - translation.x
+        val formatY = fromViewPixels(y) - translation.y
         movables.findLast { m ->
             m.x <= formatX && m.y <= formatY && m.x + m.width >= formatX && m.y + m.height >= formatY
         }
