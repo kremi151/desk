@@ -125,8 +125,9 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
     }
 
     private fun findMovableByViewPos(x: Float, y: Float): MovableT? = with(format) {
-        val formatX = fromViewPixels(x)
-        val formatY = fromViewPixels(y)
+        val translation = config.translation
+        val formatX = fromViewPixels(x) + translation.x
+        val formatY = fromViewPixels(y) + translation.y
         movables.findLast { m ->
             m.x <= formatX && m.y <= formatY && m.x + m.width >= formatX && m.y + m.height >= formatY
         }
@@ -140,6 +141,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         }
 
         override fun onScale(detector: ScaleGestureDetector): Boolean {
+            val config = config
             val scaleFactor = max(SCALE_FACTOR_MINIMUM, min(SCALE_FACTOR_MAXIMUM, detector.scaleFactor))
 
             val activeMovable = mActiveMovable ?: return true
@@ -177,6 +179,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
                 activeMovable.x += (oldWidth - newWidth) / 2f
                 activeMovable.y += (oldHeight - newHeight) / 2f
                 if (config.containMovables) {
+                    // TODO: Handle translations
                     with(format) {
                         val vWidth = fromViewPixels(mWidth.toFloat())
                         val vHeight = fromViewPixels(mHeight.toFloat())
@@ -238,8 +241,9 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
             }
             if (activeMovable != null) {
                 with(format) {
-                    mInitialPosX = toViewPixels(activeMovable.x)
-                    mInitialPosY = toViewPixels(activeMovable.y)
+                    val translation = config.translation
+                    mInitialPosX = toViewPixels(activeMovable.x + translation.x)
+                    mInitialPosY = toViewPixels(activeMovable.y + translation.y)
                     if (currentActiveMovable == null || activeMovable.id != currentActiveMovable.id) {
                         activeMovable.onFocus()
                     }
@@ -299,7 +303,10 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
     private fun handleActionUpOrCancel() {
         mActivePointerId = MotionEvent.INVALID_POINTER_ID
         val activeMovable = mActiveMovable
-        if (activeMovable != null && (mInitialPosX != activeMovable.x || mInitialPosY != activeMovable.y)) {
+        val translation = config.translation
+        val offsetInitialX = mInitialPosX - translation.x
+        val offsetInitialY = mInitialPosY - translation.y
+        if (activeMovable != null && (offsetInitialX != activeMovable.x || offsetInitialY != activeMovable.y)) {
             activeMovable.onMoved(activeMovable.x, activeMovable.y)
         }
     }
@@ -320,6 +327,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
     }
 
     private fun moveContained(movable: MovableT, newViewX: Float, newViewY: Float) {
+        // TODO: Handle translations
         with(format) {
             val newX = fromViewPixels(newViewX)
             val newY = fromViewPixels(newViewY)
