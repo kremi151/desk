@@ -75,7 +75,7 @@ internal class DeskViewThread<MovableT : Movable>(
             surfaceHolder.lockHardwareCanvas()
         } else {
             surfaceHolder.lockCanvas()
-        }
+        } ?: return
 
         canvas.drawColor(config.backgroundColor)
 
