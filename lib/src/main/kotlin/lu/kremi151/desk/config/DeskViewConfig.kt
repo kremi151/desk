@@ -8,6 +8,7 @@ data class DeskViewConfig(
     val debugMode: Boolean = false,
     val hardwareAccelerated: Boolean = false,
     val containMovables: Boolean = false,
+    val ignoreTouchEvents: Boolean = false,
     val swipeThreshold: Int = 100,
     val translation: PointF = PointF(0f, 0f),
 )

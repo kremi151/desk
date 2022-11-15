@@ -210,6 +210,9 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (config.ignoreTouchEvents) {
+            return true
+        }
         mScaleDetector.onTouchEvent(event)
         if (mScaleDetector.isInProgress) {
             return true
