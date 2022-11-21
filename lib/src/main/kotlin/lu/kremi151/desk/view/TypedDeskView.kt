@@ -203,6 +203,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         }
 
         override fun onScaleEnd(detector: ScaleGestureDetector?) {
+            mActiveMovable?.onBlur()
             mActiveMovable = null
         }
     }
