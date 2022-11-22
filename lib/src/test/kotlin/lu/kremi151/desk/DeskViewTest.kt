@@ -7,7 +7,9 @@ import lu.kremi151.desk.extensions.assertPos
 import lu.kremi151.desk.util.TestMovable
 import lu.kremi151.desk.view.DeskView
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -209,6 +211,40 @@ class DeskViewTest {
 
         assertEquals(123.0f, movable.movedX)
         assertEquals(386.0f, movable.movedY)
+    }
+
+    @Test
+    fun testIgnoringTouchEvents() {
+        movable1.assertPos(100.0f, 100.0f)
+        movable2.assertPos(300.0f, 300.0f)
+        assertFalse(deskView.config.ignoreTouchEvents)
+
+        deskView.onTouchEvent(makeTouch(200f, 200f, MotionEvent.ACTION_DOWN))
+        deskView.onTouchEvent(makeTouch(210f, 205f, MotionEvent.ACTION_MOVE))
+        deskView.onTouchEvent(makeTouch(220f, 210f, MotionEvent.ACTION_MOVE))
+        deskView.onTouchEvent(makeTouch(230f, 215f, MotionEvent.ACTION_MOVE))
+        deskView.onTouchEvent(makeTouch(240f, 220f, MotionEvent.ACTION_MOVE))
+        deskView.onTouchEvent(makeTouch(235f, 210f, MotionEvent.ACTION_MOVE))
+        deskView.onTouchEvent(makeTouch(230f, 200f, MotionEvent.ACTION_MOVE))
+        deskView.onTouchEvent(makeTouch(225f, 190f, MotionEvent.ACTION_MOVE))
+        deskView.onTouchEvent(makeTouch(220f, 180f, MotionEvent.ACTION_MOVE))
+        deskView.onTouchEvent(makeTouch(220f, 180f, MotionEvent.ACTION_UP))
+
+        movable1.assertPos(120.0f, 80.0f)
+        movable2.assertPos(300.0f, 300.0f)
+
+        deskView.config = deskView.config.copy(ignoreTouchEvents = true)
+        assertTrue(deskView.config.ignoreTouchEvents)
+
+        deskView.onTouchEvent(makeTouch(350f, 350f, MotionEvent.ACTION_DOWN))
+        deskView.onTouchEvent(makeTouch(340f, 345f, MotionEvent.ACTION_MOVE))
+        deskView.onTouchEvent(makeTouch(330f, 340f, MotionEvent.ACTION_MOVE))
+        deskView.onTouchEvent(makeTouch(320f, 335f, MotionEvent.ACTION_MOVE))
+        deskView.onTouchEvent(makeTouch(310f, 330f, MotionEvent.ACTION_MOVE))
+        deskView.onTouchEvent(makeTouch(310f, 330f, MotionEvent.ACTION_UP))
+
+        movable1.assertPos(120.0f, 80.0f)
+        movable2.assertPos(300.0f, 300.0f)
     }
 
     private fun makeTouch(x: Float, y: Float, event: Int): MotionEvent {
