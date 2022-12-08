@@ -47,6 +47,13 @@ internal class MovableCollection<MovableT: Movable> {
                 }
             }
         }
+        if (counter > 0) {
+            synchronized(listeners) {
+                listeners.forEach {
+                    it.onChanged(this)
+                }
+            }
+        }
         return counter
     }
 
