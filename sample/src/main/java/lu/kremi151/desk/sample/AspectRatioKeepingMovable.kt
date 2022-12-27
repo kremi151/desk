@@ -7,11 +7,12 @@ import lu.kremi151.desk.api.Movable
 import kotlin.math.min
 
 class AspectRatioKeepingMovable(
+    id: Long,
     private val unfocusedColor: Int,
     private val focusedColor: Int,
     private val aspectRatio: Float,
     height: Float,
-): Movable() {
+): Movable(id) {
     private val paint = Paint().apply {
         this.color = unfocusedColor
         style = Paint.Style.STROKE

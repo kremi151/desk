@@ -5,11 +5,12 @@ import android.graphics.Paint
 import lu.kremi151.desk.api.Movable
 
 class SampleMovable(
+    id: Long,
     color1: Int,
     color2: Int,
     width: Float,
     height: Float,
-): Movable() {
+): Movable(id) {
 
     private val paint1 = Paint().apply {
         color = color1

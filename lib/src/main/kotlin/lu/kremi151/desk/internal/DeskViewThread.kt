@@ -8,14 +8,14 @@ import android.view.SurfaceHolder
 import lu.kremi151.desk.BuildConfig
 import lu.kremi151.desk.api.DeskViewLayer
 import lu.kremi151.desk.api.Format
-import lu.kremi151.desk.api.Movable
+import lu.kremi151.desk.api.TypedMovable
 import lu.kremi151.desk.config.DeskViewConfig
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.Semaphore
 
-internal class DeskViewThread<MovableT : Movable>(
+internal class DeskViewThread<MovableT : TypedMovable<ID>, ID>(
     private val surfaceHolder: SurfaceHolder,
-    private val movables: MovableCollection<MovableT>,
+    private val movables: MovableCollection<MovableT, ID>,
     private val underlays: CopyOnWriteArrayList<DeskViewLayer>,
     private val overlays: CopyOnWriteArrayList<DeskViewLayer>,
     initialWidth: Int,
@@ -47,8 +47,8 @@ internal class DeskViewThread<MovableT : Movable>(
             invalidate()
         }
 
-    private val listener = object : MovableCollection.Listener<MovableT> {
-        override fun onChanged(collection: MovableCollection<MovableT>) {
+    private val listener = object : MovableCollection.Listener<MovableT, ID> {
+        override fun onChanged(collection: MovableCollection<MovableT, ID>) {
             invalidate()
         }
     };

@@ -13,6 +13,7 @@ class MainActivity : AppCompatActivity() {
         val deskView = findViewById<DeskView>(R.id.deskView)
         deskView.post {
             deskView.addMovable(SampleMovable(
+                id = 1L,
                 color1 = Color.parseColor("#bada55"),
                 color2 = Color.parseColor("#55daba"),
                 width = 400.0f,
@@ -20,6 +21,7 @@ class MainActivity : AppCompatActivity() {
             ))
             deskView.addMovable(
                 movable = SampleMovable(
+                    id = 2L,
                     color1 = Color.parseColor("#ba55da"),
                     color2 = Color.parseColor("#da55ba"),
                     width = 400.0f,
@@ -29,6 +31,7 @@ class MainActivity : AppCompatActivity() {
             )
             deskView.addMovable(
                 movable = AspectRatioKeepingMovable(
+                    id = 3L,
                     focusedColor = Color.parseColor("#00ff50"),
                     unfocusedColor = Color.parseColor("#ff0050"),
                     aspectRatio = 1.5f,

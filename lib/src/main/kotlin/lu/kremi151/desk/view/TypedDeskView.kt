@@ -13,7 +13,7 @@ import android.view.SurfaceView
 import lu.kremi151.desk.R
 import lu.kremi151.desk.api.DeskViewLayer
 import lu.kremi151.desk.api.Format
-import lu.kremi151.desk.api.Movable
+import lu.kremi151.desk.api.TypedMovable
 import lu.kremi151.desk.config.DeskViewConfig
 import lu.kremi151.desk.internal.DeskViewThread
 import lu.kremi151.desk.internal.MovableCollection
@@ -22,7 +22,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 @Suppress("TooManyFunctions")
-open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
+open class TypedDeskView<MovableT : TypedMovable<ID>, ID> @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
@@ -35,8 +35,8 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         private const val DEFAULT_SWIPE_THRESHOLD_MS = 100
     }
 
-    private var thread: DeskViewThread<MovableT>? = null
-    private val movables = MovableCollection<MovableT>()
+    private var thread: DeskViewThread<MovableT, ID>? = null
+    private val movables = MovableCollection<MovableT, ID>()
     private val underlays = CopyOnWriteArrayList<DeskViewLayer>()
     private val overlays = CopyOnWriteArrayList<DeskViewLayer>()
 
@@ -134,8 +134,15 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
     }
 
     private val scaleListener = object : ScaleGestureDetector.OnScaleGestureListener {
+
+        private var oldWidth = 0f
+        private var oldHeight = 0f
+
         override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
-            val movable = findMovableByViewPos(detector.focusX, detector.focusY)
+            val movable = findMovableByViewPos(detector.focusX, detector.focusY)?.also {
+                oldWidth = it.width
+                oldHeight = it.height
+            }
             mActiveMovable = movable
             return movable != null
         }
@@ -204,7 +211,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
 
         override fun onScaleEnd(detector: ScaleGestureDetector?) {
             mActiveMovable?.let {
-                it.onMoved(it.x, it.y)
+                it.onMovedAndResized(it.x, it.y, it.width, it.height, oldWidth, oldHeight, true)
                 it.onBlur()
             }
             mActiveMovable = null
@@ -314,7 +321,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         val offsetInitialX = mInitialPosX - translation.x
         val offsetInitialY = mInitialPosY - translation.y
         if (activeMovable != null && (offsetInitialX != activeMovable.x || offsetInitialY != activeMovable.y)) {
-            activeMovable.onMoved(activeMovable.x, activeMovable.y)
+            activeMovable.onMoved(activeMovable.x, activeMovable.y, true)
         }
     }
 
@@ -366,7 +373,7 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
         movables.add(movable.apply {
             this.x = x
             this.y = y
-            onMoved(x, y)
+            onMoved(x, y, false)
         })
     }
 
@@ -380,6 +387,10 @@ open class TypedDeskView<MovableT : Movable> @JvmOverloads constructor(
 
     fun forEachMovable(block: (MovableT) -> Unit) {
         movables.forEach(block)
+    }
+
+    fun firstOrNull(predicate: (MovableT) -> Boolean): MovableT? {
+        return movables.firstOrNull(predicate)
     }
 
     fun addUnderlay(underlay: DeskViewLayer) {

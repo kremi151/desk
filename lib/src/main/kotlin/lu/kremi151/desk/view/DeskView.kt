@@ -8,4 +8,4 @@ open class DeskView @JvmOverloads constructor(
     context: Context, attrs:
     AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : TypedDeskView<Movable>(context, attrs, defStyleAttr)
+) : TypedDeskView<Movable, Long>(context, attrs, defStyleAttr)
