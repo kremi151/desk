@@ -11,10 +11,12 @@ import android.view.ScaleGestureDetector
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import lu.kremi151.desk.R
+import lu.kremi151.desk.api.DeskViewController
 import lu.kremi151.desk.api.DeskViewLayer
 import lu.kremi151.desk.api.Format
 import lu.kremi151.desk.api.TypedMovable
 import lu.kremi151.desk.config.DeskViewConfig
+import lu.kremi151.desk.internal.DeskViewControllerImpl
 import lu.kremi151.desk.internal.DeskViewThread
 import lu.kremi151.desk.internal.MovableCollection
 import java.util.concurrent.CopyOnWriteArrayList
@@ -369,29 +371,7 @@ open class TypedDeskView<MovableT : TypedMovable<ID>, ID> @JvmOverloads construc
     val focusedMovable: MovableT?
         get() = mActiveMovable
 
-    fun addMovable(movable: MovableT, x: Float = 0.0f, y: Float = 0.0f) {
-        movables.add(movable.apply {
-            this.x = x
-            this.y = y
-            onMoved(x, y, false)
-        })
-    }
-
-    fun removeMovable(movable: MovableT): Boolean {
-        return movables.remove(movable)
-    }
-
-    fun removeMovables(predicate: (MovableT) -> Boolean): Int {
-        return movables.removeIf(predicate)
-    }
-
-    fun forEachMovable(block: (MovableT) -> Unit) {
-        movables.forEach(block)
-    }
-
-    fun firstOrNull(predicate: (MovableT) -> Boolean): MovableT? {
-        return movables.firstOrNull(predicate)
-    }
+    val controller: DeskViewController<MovableT, ID> = DeskViewControllerImpl(movables)
 
     fun addUnderlay(underlay: DeskViewLayer) {
         underlay.onSizeChanged(mWidth, mHeight)
@@ -409,18 +389,6 @@ open class TypedDeskView<MovableT : TypedMovable<ID>, ID> @JvmOverloads construc
 
     fun removeOverlay(overlay: DeskViewLayer): Boolean {
         return overlays.remove(overlay)
-    }
-
-    fun moveToForeground(movable: MovableT, entirely: Boolean = false) {
-        if (movables.moveToForeground(movable, entirely)) {
-            invalidate()
-        }
-    }
-
-    fun moveToBackground(movable: MovableT, entirely: Boolean = false) {
-        if (movables.moveToBackground(movable, entirely)) {
-            invalidate()
-        }
     }
 
     private fun pause() {

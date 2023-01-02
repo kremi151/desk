@@ -18,11 +18,7 @@ internal class MovableCollection<MovableT: TypedMovable<ID>, ID> {
             movables.add(movable.also { it.bound = true })
             id2Movables[movable.id] = movable
         }
-        synchronized(listeners) {
-            listeners.forEach {
-                it.onChanged(this)
-            }
-        }
+        callListeners()
     }
 
     fun remove(movable: MovableT): Boolean {
@@ -35,11 +31,7 @@ internal class MovableCollection<MovableT: TypedMovable<ID>, ID> {
             removed
         }
         if (removed) {
-            synchronized(listeners) {
-                listeners.forEach {
-                    it.onChanged(this)
-                }
-            }
+            callListeners()
         }
         return removed
     }
@@ -59,11 +51,7 @@ internal class MovableCollection<MovableT: TypedMovable<ID>, ID> {
             }
         }
         if (counter > 0) {
-            synchronized(listeners) {
-                listeners.forEach {
-                    it.onChanged(this)
-                }
-            }
+            callListeners()
         }
         return counter
     }
@@ -83,7 +71,7 @@ internal class MovableCollection<MovableT: TypedMovable<ID>, ID> {
         }
     }
 
-    fun findFirst(predicate: (MovableT) -> Boolean): MovableT? = lock.withLock {
+    fun firstOrNull(predicate: (MovableT) -> Boolean): MovableT? = lock.withLock {
         movables.firstOrNull(predicate)
     }
 
@@ -112,11 +100,7 @@ internal class MovableCollection<MovableT: TypedMovable<ID>, ID> {
             }
         }
         if (changed) {
-            synchronized(listeners) {
-                listeners.forEach {
-                    it.onChanged(this)
-                }
-            }
+            callListeners()
         }
         return changed
     }
@@ -138,11 +122,7 @@ internal class MovableCollection<MovableT: TypedMovable<ID>, ID> {
             }
         }
         if (changed) {
-            synchronized(listeners) {
-                listeners.forEach {
-                    it.onChanged(this)
-                }
-            }
+            callListeners()
         }
         return changed
     }
@@ -159,11 +139,7 @@ internal class MovableCollection<MovableT: TypedMovable<ID>, ID> {
             }
         }
         if (changed) {
-            synchronized(listeners) {
-                listeners.forEach {
-                    it.onChanged(this)
-                }
-            }
+            callListeners()
         }
         return changed
     }
@@ -177,6 +153,14 @@ internal class MovableCollection<MovableT: TypedMovable<ID>, ID> {
     fun removeListener(listener: Listener<MovableT, ID>): Boolean {
         return synchronized(listener) {
             listeners.remove(listener)
+        }
+    }
+
+    private fun callListeners() {
+        synchronized(listeners) {
+            listeners.forEach {
+                it.onChanged(this)
+            }
         }
     }
 
