@@ -4,21 +4,34 @@ import lu.kremi151.desk.api.TypedMovable
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-internal class MovableCollection<MovableT: TypedMovable<ID>, ID> {
+internal class MovableCollection<MovableT: TypedMovable<ID, ContextT>, ID, ContextT>(
+    private val getContext: () -> ContextT?,
+) {
 
     private val movables = mutableListOf<MovableT>()
     private val id2Movables = mutableMapOf<ID, MovableT>()
-    private val listeners = mutableListOf<Listener<MovableT, ID>>()
+    private val listeners = mutableListOf<Listener<MovableT, ID, ContextT>>()
 
     private val lock = ReentrantLock()
 
     fun add(movable: MovableT) {
         check(!movable.bound) { "Movable is already bound to a DeskView" }
         lock.withLock {
-            movables.add(movable.also { it.bound = true })
+            movables.add(movable.also {
+                it.bound = true
+                it.context = getContext()
+            })
             id2Movables[movable.id] = movable
         }
         callListeners()
+    }
+
+    fun updateContexts() {
+        lock.withLock {
+            movables.forEach {
+                it.context = getContext()
+            }
+        }
     }
 
     fun remove(movable: MovableT): Boolean {
@@ -26,6 +39,7 @@ internal class MovableCollection<MovableT: TypedMovable<ID>, ID> {
             val removed = movables.remove(movable)
             if (removed) {
                 movable.bound = false
+                movable.context = null
                 id2Movables.remove(movable.id)
             }
             removed
@@ -144,13 +158,13 @@ internal class MovableCollection<MovableT: TypedMovable<ID>, ID> {
         return changed
     }
 
-    fun addListener(listener: Listener<MovableT, ID>) {
+    fun addListener(listener: Listener<MovableT, ID, ContextT>) {
         synchronized(listener) {
             listeners.add(listener)
         }
     }
 
-    fun removeListener(listener: Listener<MovableT, ID>): Boolean {
+    fun removeListener(listener: Listener<MovableT, ID, ContextT>): Boolean {
         return synchronized(listener) {
             listeners.remove(listener)
         }
@@ -164,8 +178,8 @@ internal class MovableCollection<MovableT: TypedMovable<ID>, ID> {
         }
     }
 
-    interface Listener<MovableT: TypedMovable<ID>, ID> {
-        fun onChanged(collection: MovableCollection<MovableT, ID>)
+    interface Listener<MovableT: TypedMovable<ID, ContextT>, ID, ContextT> {
+        fun onChanged(collection: MovableCollection<MovableT, ID, ContextT>)
     }
 
 }

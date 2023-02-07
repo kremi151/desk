@@ -24,7 +24,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 @Suppress("TooManyFunctions")
-open class TypedDeskView<MovableT : TypedMovable<ID>, ID> @JvmOverloads constructor(
+open class TypedDeskView<MovableT : TypedMovable<ID, ContextT>, ID, ContextT> @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
@@ -37,10 +37,18 @@ open class TypedDeskView<MovableT : TypedMovable<ID>, ID> @JvmOverloads construc
         private const val DEFAULT_SWIPE_THRESHOLD_MS = 100
     }
 
-    private var thread: DeskViewThread<MovableT, ID>? = null
-    private val movables = MovableCollection<MovableT, ID>()
+    private var thread: DeskViewThread<MovableT, ID, ContextT>? = null
+    private val movables = MovableCollection<MovableT, ID, ContextT>(
+        getContext = { customContext },
+    )
     private val underlays = CopyOnWriteArrayList<DeskViewLayer>()
     private val overlays = CopyOnWriteArrayList<DeskViewLayer>()
+
+    var customContext: ContextT? = null
+        set(value) {
+            field = value
+            movables.updateContexts()
+        }
 
     var format: Format = Format.DEFAULT
         set(value) {
@@ -371,7 +379,7 @@ open class TypedDeskView<MovableT : TypedMovable<ID>, ID> @JvmOverloads construc
     val focusedMovable: MovableT?
         get() = mActiveMovable
 
-    val controller: DeskViewController<MovableT, ID> = DeskViewControllerImpl(movables)
+    val controller: DeskViewController<MovableT, ID, ContextT> = DeskViewControllerImpl(movables)
 
     fun addUnderlay(underlay: DeskViewLayer) {
         underlay.onSizeChanged(mWidth, mHeight)

@@ -2,9 +2,12 @@ package lu.kremi151.desk.api
 
 import android.graphics.Canvas
 
-abstract class TypedMovable<ID>(internal val id: ID) {
+abstract class TypedMovable<ID, ContextT>(internal val id: ID) {
 
     internal var bound = false
+
+    var context: ContextT? = null
+        internal set
 
     var x: Float = 0.0f
         internal set

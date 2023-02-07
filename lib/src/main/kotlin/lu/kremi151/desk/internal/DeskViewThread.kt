@@ -13,9 +13,9 @@ import lu.kremi151.desk.config.DeskViewConfig
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.Semaphore
 
-internal class DeskViewThread<MovableT : TypedMovable<ID>, ID>(
+internal class DeskViewThread<MovableT : TypedMovable<ID, ContextT>, ID, ContextT>(
     private val surfaceHolder: SurfaceHolder,
-    private val movables: MovableCollection<MovableT, ID>,
+    private val movables: MovableCollection<MovableT, ID, ContextT>,
     private val underlays: CopyOnWriteArrayList<DeskViewLayer>,
     private val overlays: CopyOnWriteArrayList<DeskViewLayer>,
     initialWidth: Int,
@@ -47,8 +47,8 @@ internal class DeskViewThread<MovableT : TypedMovable<ID>, ID>(
             invalidate()
         }
 
-    private val listener = object : MovableCollection.Listener<MovableT, ID> {
-        override fun onChanged(collection: MovableCollection<MovableT, ID>) {
+    private val listener = object : MovableCollection.Listener<MovableT, ID, ContextT> {
+        override fun onChanged(collection: MovableCollection<MovableT, ID, ContextT>) {
             invalidate()
         }
     };

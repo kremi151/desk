@@ -3,9 +3,9 @@ package lu.kremi151.desk.internal
 import lu.kremi151.desk.api.DeskViewController
 import lu.kremi151.desk.api.TypedMovable
 
-internal class DeskViewControllerImpl<MovableT : TypedMovable<ID>, ID>(
-    private val movables: MovableCollection<MovableT, ID>,
-): DeskViewController<MovableT, ID> {
+internal class DeskViewControllerImpl<MovableT : TypedMovable<ID, ContextT>, ID, ContextT>(
+    private val movables: MovableCollection<MovableT, ID, ContextT>,
+): DeskViewController<MovableT, ID, ContextT> {
 
     override fun addMovable(movable: MovableT, x: Float, y: Float) {
         movables.add(movable.apply {
