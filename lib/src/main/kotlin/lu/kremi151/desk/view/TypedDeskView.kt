@@ -11,10 +11,7 @@ import android.view.ScaleGestureDetector
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import lu.kremi151.desk.R
-import lu.kremi151.desk.api.DeskViewController
-import lu.kremi151.desk.api.DeskViewLayer
-import lu.kremi151.desk.api.Format
-import lu.kremi151.desk.api.TypedMovable
+import lu.kremi151.desk.api.*
 import lu.kremi151.desk.config.DeskViewConfig
 import lu.kremi151.desk.internal.DeskViewControllerImpl
 import lu.kremi151.desk.internal.DeskViewThread
@@ -43,6 +40,7 @@ open class TypedDeskView<MovableT : TypedMovable<ID, ContextT>, ID, ContextT> @J
     )
     private val underlays = CopyOnWriteArrayList<DeskViewLayer>()
     private val overlays = CopyOnWriteArrayList<DeskViewLayer>()
+    private val touchEventHandlers = CopyOnWriteArrayList<DeskViewTouchHandler>()
 
     var customContext: ContextT? = null
         set(value) {
@@ -234,6 +232,7 @@ open class TypedDeskView<MovableT : TypedMovable<ID, ContextT>, ID, ContextT> @J
         if (config.ignoreTouchEvents) {
             return true
         }
+        touchEventHandlers.forEach { it(event) }
         mScaleDetector.onTouchEvent(event)
         if (mScaleDetector.isInProgress) {
             return true
@@ -397,6 +396,14 @@ open class TypedDeskView<MovableT : TypedMovable<ID, ContextT>, ID, ContextT> @J
 
     fun removeOverlay(overlay: DeskViewLayer): Boolean {
         return overlays.remove(overlay)
+    }
+
+    fun addTouchHandler(listener: DeskViewTouchHandler) {
+        touchEventHandlers.add(listener)
+    }
+
+    fun removeTouchHandler(listener: DeskViewTouchHandler): Boolean {
+        return touchEventHandlers.remove(listener)
     }
 
     private fun pause() {
