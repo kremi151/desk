@@ -141,23 +141,6 @@ internal class MovableCollection<MovableT: TypedMovable<ID, ContextT>, ID, Conte
         return changed
     }
 
-    fun move(id: ID, x: Float, y: Float): Boolean {
-        val changed = lock.withLock {
-            val movable = id2Movables[id]
-            if (movable == null) {
-                false
-            } else {
-                movable.x = x
-                movable.y = y
-                true
-            }
-        }
-        if (changed) {
-            callListeners()
-        }
-        return changed
-    }
-
     fun addListener(listener: Listener<MovableT, ID, ContextT>) {
         synchronized(listener) {
             listeners.add(listener)

@@ -2,7 +2,7 @@ package lu.kremi151.desk.sample
 
 import android.graphics.Canvas
 import android.graphics.Paint
-import lu.kremi151.desk.api.Movable
+import lu.kremi151.desk.api.SimpleMovable
 
 class SampleMovable(
     id: Long,
@@ -10,7 +10,9 @@ class SampleMovable(
     color2: Int,
     width: Float,
     height: Float,
-): Movable(id) {
+    initialX: Float = 0.0f,
+    initialY: Float = 0.0f,
+): SimpleMovable(id, width, height, initialX, initialY) {
 
     private val paint1 = Paint().apply {
         color = color1
@@ -19,17 +21,6 @@ class SampleMovable(
     private val paint2 = Paint().apply {
         color = color2
         style = Paint.Style.FILL
-    }
-
-    override var width: Float = width
-        private set
-
-    override var height: Float = height
-        private set
-
-    override fun remeasure(desiredWidth: Float, desiredHeight: Float) {
-        width = desiredWidth
-        height = desiredHeight
     }
 
     override fun draw(canvas: Canvas) {

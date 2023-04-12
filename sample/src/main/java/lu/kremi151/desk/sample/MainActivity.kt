@@ -27,8 +27,8 @@ class MainActivity : AppCompatActivity() {
                     color2 = Color.parseColor("#da55ba"),
                     width = 400.0f,
                     height = 400.0f,
+                    initialX = deskView.width - 400.0f,
                 ),
-                x = deskView.width - 400.0f,
             )
             controller.addMovable(
                 movable = AspectRatioKeepingMovable(
@@ -37,8 +37,8 @@ class MainActivity : AppCompatActivity() {
                     unfocusedColor = Color.parseColor("#ff0050"),
                     aspectRatio = 1.5f,
                     height = 400.0f,
+                    initialY = deskView.height - 400.0f,
                 ),
-                y = deskView.height - 400.0f,
             )
         }
     }

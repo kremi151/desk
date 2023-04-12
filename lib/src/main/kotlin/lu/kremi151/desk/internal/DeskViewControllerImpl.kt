@@ -7,12 +7,8 @@ internal class DeskViewControllerImpl<MovableT : TypedMovable<ID, ContextT>, ID,
     private val movables: MovableCollection<MovableT, ID, ContextT>,
 ): DeskViewController<MovableT, ID, ContextT> {
 
-    override fun addMovable(movable: MovableT, x: Float, y: Float) {
-        movables.add(movable.apply {
-            this.x = x
-            this.y = y
-            onMoved(x, y, false)
-        })
+    override fun addMovable(movable: MovableT) {
+        movables.add(movable)
     }
 
     override fun removeMovable(movable: MovableT): Boolean {
@@ -29,10 +25,6 @@ internal class DeskViewControllerImpl<MovableT : TypedMovable<ID, ContextT>, ID,
 
     override fun firstOrNull(predicate: (MovableT) -> Boolean): MovableT? {
         return movables.firstOrNull(predicate)
-    }
-
-    override fun move(id: ID, x: Float, y: Float): Boolean {
-        return movables.move(id, x, y)
     }
 
     override fun moveToForeground(movable: MovableT, entirely: Boolean): Boolean {

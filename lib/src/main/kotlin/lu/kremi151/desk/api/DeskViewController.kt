@@ -2,7 +2,7 @@ package lu.kremi151.desk.api
 
 interface DeskViewController<MovableT : TypedMovable<ID, ContextT>, ID, ContextT> {
 
-    fun addMovable(movable: MovableT, x: Float = 0.0f, y: Float = 0.0f)
+    fun addMovable(movable: MovableT)
 
     fun removeMovable(movable: MovableT): Boolean
     fun removeMovables(predicate: (MovableT) -> Boolean): Int
@@ -10,8 +10,6 @@ interface DeskViewController<MovableT : TypedMovable<ID, ContextT>, ID, ContextT
     fun forEachMovable(block: (MovableT) -> Unit)
 
     fun firstOrNull(predicate: (MovableT) -> Boolean): MovableT?
-
-    fun move(id: ID, x: Float, y: Float): Boolean
 
     fun moveToForeground(movable: MovableT, entirely: Boolean = false): Boolean
     fun moveToBackground(movable: MovableT, entirely: Boolean = false): Boolean
