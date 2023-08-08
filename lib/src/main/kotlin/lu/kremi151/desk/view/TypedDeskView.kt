@@ -11,7 +11,11 @@ import android.view.ScaleGestureDetector
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import lu.kremi151.desk.R
-import lu.kremi151.desk.api.*
+import lu.kremi151.desk.api.DeskViewController
+import lu.kremi151.desk.api.DeskViewLayer
+import lu.kremi151.desk.api.DeskViewTouchHandler
+import lu.kremi151.desk.api.Format
+import lu.kremi151.desk.api.TypedMovable
 import lu.kremi151.desk.config.DeskViewConfig
 import lu.kremi151.desk.internal.DeskViewControllerImpl
 import lu.kremi151.desk.internal.DeskViewThread
@@ -32,6 +36,8 @@ open class TypedDeskView<MovableT : TypedMovable<ID, ContextT>, ID, ContextT> @J
         private const val SCALE_FACTOR_MAXIMUM = 5.0f
 
         private const val DEFAULT_SWIPE_THRESHOLD_MS = 100
+
+        private const val MAX_JOIN_TIMEOUT_ON_PREVIOUS_THREAD = 500L
     }
 
     private var thread: DeskViewThread<MovableT, ID, ContextT>? = null
@@ -198,7 +204,7 @@ open class TypedDeskView<MovableT : TypedMovable<ID, ContextT>, ID, ContextT> @J
                 var newX = activeMovable.x + (oldWidth - newWidth) / 2f
                 var newY = activeMovable.y + (oldHeight - newHeight) / 2f
                 if (config.containMovables) {
-                    // TODO: Handle translations
+                    // TODO: Handle translations (#2)
                     with(format) {
                         val vWidth = fromViewPixels(mWidth.toFloat())
                         val vHeight = fromViewPixels(mHeight.toFloat())
@@ -366,7 +372,7 @@ open class TypedDeskView<MovableT : TypedMovable<ID, ContextT>, ID, ContextT> @J
     }
 
     private fun moveContained(movable: MovableT, newViewX: Float, newViewY: Float) {
-        // TODO: Handle translations
+        // TODO: Handle translations (#2)
         with(format) {
             var newX = fromViewPixels(newViewX)
             var newY = fromViewPixels(newViewY)
@@ -436,7 +442,7 @@ open class TypedDeskView<MovableT : TypedMovable<ID, ContextT>, ID, ContextT> @J
     private fun resume() {
         thread?.let {
             it.quit()
-            it.join(500L)
+            it.join(MAX_JOIN_TIMEOUT_ON_PREVIOUS_THREAD)
         }
         thread = DeskViewThread(
             surfaceHolder = holder,

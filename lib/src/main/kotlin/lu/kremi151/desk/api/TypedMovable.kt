@@ -59,7 +59,17 @@ abstract class TypedMovable<ID, ContextT>(internal val id: ID) {
      * @param prevWidth  The previous width
      * @param prevHeight The previous height
      */
-    open fun onMovedAndResized(x: Float, y: Float, width: Float, height: Float, prevX: Float, prevY: Float, prevWidth: Float, prevHeight: Float) {
+    @Suppress("LongParameterList")
+    open fun onMovedAndResized(
+        x: Float,
+        y: Float,
+        width: Float,
+        height: Float,
+        prevX: Float,
+        prevY: Float,
+        prevWidth: Float,
+        prevHeight: Float,
+    ) {
         onMoved(x, y, prevX, prevY)
         onResized(width, height, prevWidth, prevHeight)
     }
