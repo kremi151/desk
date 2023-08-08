@@ -46,3 +46,5 @@ jobs:
           delete-only-pre-release-versions: "true"
         continue-on-error: true
         if: ${{ github.event_name != 'pull_request' }}
+      - name: Trigger Jitpack build
+        run: curl https://jitpack.io/api/builds/com.github.kremi151/desk/${GITHUB_SHA::7}
