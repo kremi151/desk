@@ -52,19 +52,11 @@ class DeskViewTest {
             swipeThreshold = 0,
         )
 
-        movable1 = TestMovable(400.0f, 400.0f).also {
-            deskView.addMovable(
-                movable = it,
-                x = 100.0f,
-                y = 100.0f,
-            )
+        movable1 = TestMovable(1, mWidth = 400.0f, mHeight = 400.0f, mX= 100.0f, mY = 100.0f).also {
+            deskView.controller.addMovable(it)
         }
-        movable2 = TestMovable(400.0f, 400.0f).also {
-            deskView.addMovable(
-                movable = it,
-                x = 300.0f,
-                y = 300.0f,
-            )
+        movable2 = TestMovable(2, mWidth = 400.0f, mHeight = 400.0f, mX = 300.0f, mY = 300.0f).also {
+            deskView.controller.addMovable(it)
         }
     }
 
@@ -202,15 +194,11 @@ class DeskViewTest {
 
     @Test
     fun testInitialOnMovedCalled() {
-        val movable = TestMovable(420f, 420f)
-        deskView.addMovable(
-            movable = movable,
-            x = 123.0f,
-            y = 386.0f,
-        )
+        val movable = TestMovable(99, mWidth = 420f, mHeight = 420f, mX = 123.0f, mY = 386.0f)
+        deskView.controller.addMovable(movable)
 
-        assertEquals(123.0f, movable.movedX)
-        assertEquals(386.0f, movable.movedY)
+        assertEquals(123.0f, movable.x)
+        assertEquals(386.0f, movable.y)
     }
 
     @Test

@@ -4,20 +4,25 @@ import android.graphics.Canvas
 import lu.kremi151.desk.api.Movable
 
 class TestMovable(
+    id: Long,
     private var mWidth: Float,
     private var mHeight: Float,
-): Movable() {
+    private var mX: Float,
+    private var mY: Float,
+): Movable(id) {
 
     var focusedCounter = 0
     var tappedX: Float = -1.0f
     var tappedY: Float = -1.0f
-    var movedX: Float = -1.0f
-    var movedY: Float = -1.0f
 
     override val width: Float
         get() = mWidth
     override val height: Float
         get() = mHeight
+    override val x: Float
+        get() = mX
+    override val y: Float
+        get() = mY
 
     override fun remeasure(desiredWidth: Float, desiredHeight: Float) {
         mWidth = desiredWidth
@@ -37,9 +42,9 @@ class TestMovable(
         tappedY = y
     }
 
-    override fun onMoved(x: Float, y: Float) {
-        movedX = x
-        movedY = y
+    override fun move(desiredX: Float, desiredY: Float) {
+        mX = desiredX
+        mY = desiredY
     }
 
     @Suppress("EmptyFunctionBlock")
