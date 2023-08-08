@@ -434,6 +434,10 @@ open class TypedDeskView<MovableT : TypedMovable<ID, ContextT>, ID, ContextT> @J
     }
 
     private fun resume() {
+        thread?.let {
+            it.quit()
+            it.join(500L)
+        }
         thread = DeskViewThread(
             surfaceHolder = holder,
             movables = movables,
