@@ -74,7 +74,33 @@ abstract class TypedMovable<ID, ContextT>(internal val id: ID) {
         onResized(width, height, prevWidth, prevHeight)
     }
 
-    open fun onTapped(x: Float, y: Float) {
+    /**
+     * Callback for when the movable has been tapped by the user
+     * @param x The x coordinate, relative to the movable's position
+     * @param y the y coordinate, relative to the movable's position
+     * @return true if the movable can be dragged along any swipe gesture, false otherwise
+     */
+    open fun onTapped(x: Float, y: Float): Boolean {
+        // No-op by default
+        return true
+    }
+
+    /**
+     * Callback for when the movable is about to begin scaling due to user interaction
+     * @param focusX The x coordinate of the focus point, relative to the movable's position
+     * @param focusY the y coordinate of the focus point, relative to the movable's position
+     * @return true if the movable can be scaled using pinch gesture, false otherwise
+     */
+    open fun onScaleStart(focusX: Float, focusY: Float): Boolean {
+        // No-op by default
+        return true
+    }
+
+    /**
+     * Callback for when movable finishes scaling due to user interaction.
+     * Note that this will only be called if [onScaleStart] returns true.
+     */
+    open fun onScaleEnd() {
         // No-op by default
     }
 

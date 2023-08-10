@@ -155,11 +155,19 @@ open class TypedDeskView<MovableT : TypedMovable<ID, ContextT>, ID, ContextT> @J
         private var oldHeight = 0f
 
         override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
-            val movable = findMovableByViewPos(detector.focusX, detector.focusY)?.also {
+            var movable = findMovableByViewPos(detector.focusX, detector.focusY)?.also {
                 oldX = it.x
                 oldY = it.y
                 oldWidth = it.width
                 oldHeight = it.height
+            }
+            movable = if (movable?.onScaleStart(
+                    focusX = format.fromViewPixels(detector.focusX) - movable.x,
+                    focusY = format.fromViewPixels(detector.focusY) - movable.y,
+            ) == true) {
+                movable
+            } else {
+                null
             }
             mActiveMovable = movable
             return movable != null
@@ -241,6 +249,7 @@ open class TypedDeskView<MovableT : TypedMovable<ID, ContextT>, ID, ContextT> @J
                     prevHeight = oldHeight,
                 )
                 it.onBlur()
+                it.onScaleEnd()
             }
             mActiveMovable = null
         }
@@ -267,11 +276,12 @@ open class TypedDeskView<MovableT : TypedMovable<ID, ContextT>, ID, ContextT> @J
         return true
     }
 
+    @Suppress("NestedBlockDepth")
     private fun handleActionDown(event: MotionEvent) {
         mTouchStarted = SystemClock.uptimeMillis()
         var shouldInvalidate = false
 
-        event.actionIndex.also { pointerIndex ->
+        val continueDragging = event.actionIndex.let { pointerIndex ->
             // Remember where we started (for dragging)
             mLastTouchX = event.getX(pointerIndex)
             mLastTouchY = event.getY(pointerIndex)
@@ -282,7 +292,7 @@ open class TypedDeskView<MovableT : TypedMovable<ID, ContextT>, ID, ContextT> @J
                 currentActiveMovable.onBlur()
                 shouldInvalidate = true
             }
-            if (activeMovable != null) {
+            val canDrag = if (activeMovable != null) {
                 with(format) {
                     val translation = config.translation
                     mInitialPosX = toViewPixels(activeMovable.x + translation.x)
@@ -290,14 +300,15 @@ open class TypedDeskView<MovableT : TypedMovable<ID, ContextT>, ID, ContextT> @J
                     if (currentActiveMovable == null || activeMovable.id != currentActiveMovable.id) {
                         activeMovable.onFocus()
                     }
+                    shouldInvalidate = true
                     activeMovable.onTapped(
                         fromViewPixels(mLastTouchX - mInitialPosX),
                         fromViewPixels(mLastTouchY - mInitialPosY),
                     )
                 }
-                shouldInvalidate = true
-            }
+            } else true
             mActiveMovable = activeMovable
+            canDrag
         }
 
         if (shouldInvalidate) {
@@ -305,10 +316,14 @@ open class TypedDeskView<MovableT : TypedMovable<ID, ContextT>, ID, ContextT> @J
         }
 
         // Save the ID of this pointer (for dragging)
-        mActivePointerId = event.getPointerId(0)
+        mActivePointerId = if (continueDragging) {
+            event.getPointerId(0)
+        } else MotionEvent.INVALID_POINTER_ID
     }
 
     private fun handleActionMove(event: MotionEvent) {
+        if (mActivePointerId == MotionEvent.INVALID_POINTER_ID) return
+
         // Find the index of the active pointer and fetch its position
         val (x: Float, y: Float) =
             event.findPointerIndex(mActivePointerId).let { pointerIndex ->

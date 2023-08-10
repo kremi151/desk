@@ -14,6 +14,7 @@ class TestMovable(
     var focusedCounter = 0
     var tappedX: Float = -1.0f
     var tappedY: Float = -1.0f
+    var onTappedResult = true
 
     override val width: Float
         get() = mWidth
@@ -37,9 +38,10 @@ class TestMovable(
         focusedCounter = 0
     }
 
-    override fun onTapped(x: Float, y: Float) {
+    override fun onTapped(x: Float, y: Float): Boolean {
         tappedX = x
         tappedY = y
+        return onTappedResult
     }
 
     override fun move(desiredX: Float, desiredY: Float) {

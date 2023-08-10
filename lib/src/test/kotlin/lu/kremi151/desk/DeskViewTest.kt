@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.SystemClock
 import android.view.MotionEvent
 import lu.kremi151.desk.extensions.assertPos
+import lu.kremi151.desk.extensions.assertTapped
 import lu.kremi151.desk.util.TestMovable
 import lu.kremi151.desk.view.DeskView
 import org.junit.Assert.assertEquals
@@ -177,6 +178,29 @@ class DeskViewTest {
         ShadowSystemClock.advanceBy(75L, TimeUnit.MILLISECONDS)
         deskView.onTouchEvent(makeTouch(230f, 215f, MotionEvent.ACTION_UP))
         movable1.assertPos(130.0f, 115.0f)
+    }
+
+    @Test
+    fun testMovingMovableWithOnTappedReturningFalse() {
+        movable1.onTappedResult = false
+
+        movable1.assertTapped(-1.0f, -1.0f)
+        movable1.assertPos(100.0f, 100.0f)
+
+        deskView.onTouchEvent(makeTouch(200f, 200f, MotionEvent.ACTION_DOWN))
+        movable1.assertTapped(100.0f, 100.0f)
+        deskView.onTouchEvent(makeTouch(210f, 205f, MotionEvent.ACTION_MOVE))
+        deskView.onTouchEvent(makeTouch(220f, 210f, MotionEvent.ACTION_MOVE))
+        deskView.onTouchEvent(makeTouch(230f, 215f, MotionEvent.ACTION_MOVE))
+        deskView.onTouchEvent(makeTouch(240f, 220f, MotionEvent.ACTION_MOVE))
+        deskView.onTouchEvent(makeTouch(235f, 210f, MotionEvent.ACTION_MOVE))
+        deskView.onTouchEvent(makeTouch(230f, 200f, MotionEvent.ACTION_MOVE))
+        deskView.onTouchEvent(makeTouch(225f, 190f, MotionEvent.ACTION_MOVE))
+        deskView.onTouchEvent(makeTouch(220f, 180f, MotionEvent.ACTION_MOVE))
+        deskView.onTouchEvent(makeTouch(220f, 180f, MotionEvent.ACTION_UP))
+
+        movable1.assertTapped(100.0f, 100.0f)
+        movable1.assertPos(100.0f, 100.0f)
     }
 
     @Test
