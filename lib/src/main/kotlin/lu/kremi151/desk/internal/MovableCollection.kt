@@ -145,6 +145,13 @@ internal class MovableCollection<MovableT: TypedMovable<ID, ContextT>, ID, Conte
         return changed
     }
 
+    fun sortWith(comparator: Comparator<MovableT>) {
+        lock.withLock {
+            movables.sortWith(comparator)
+        }
+        callListeners()
+    }
+
     fun addListener(listener: Listener<MovableT, ID, ContextT>) {
         synchronized(listener) {
             listeners.add(listener)

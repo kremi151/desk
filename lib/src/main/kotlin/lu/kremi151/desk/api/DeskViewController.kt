@@ -14,5 +14,6 @@ interface DeskViewController<MovableT : TypedMovable<ID, ContextT>, ID, ContextT
 
     fun moveToForeground(movable: MovableT, entirely: Boolean = false): Boolean
     fun moveToBackground(movable: MovableT, entirely: Boolean = false): Boolean
+    fun sortMovablesWith(comparator: Comparator<MovableT>)
 
 }

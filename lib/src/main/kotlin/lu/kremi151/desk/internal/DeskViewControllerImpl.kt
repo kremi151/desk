@@ -39,4 +39,8 @@ internal class DeskViewControllerImpl<MovableT : TypedMovable<ID, ContextT>, ID,
         return movables.moveToBackground(movable, entirely)
     }
 
+    override fun sortMovablesWith(comparator: Comparator<MovableT>) {
+        movables.sortWith(comparator)
+    }
+
 }
