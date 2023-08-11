@@ -23,6 +23,10 @@ internal class DeskViewControllerImpl<MovableT : TypedMovable<ID, ContextT>, ID,
         movables.forEach(block)
     }
 
+    override fun <R> mapMovables(mapper: (MovableT) -> R): List<R> {
+        return movables.map(mapper)
+    }
+
     override fun firstOrNull(predicate: (MovableT) -> Boolean): MovableT? {
         return movables.firstOrNull(predicate)
     }

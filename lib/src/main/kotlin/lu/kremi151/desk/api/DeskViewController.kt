@@ -8,6 +8,7 @@ interface DeskViewController<MovableT : TypedMovable<ID, ContextT>, ID, ContextT
     fun removeMovables(predicate: (MovableT) -> Boolean): Int
 
     fun forEachMovable(block: (MovableT) -> Unit)
+    fun <R> mapMovables(mapper: (MovableT) -> R): List<R>
 
     fun firstOrNull(predicate: (MovableT) -> Boolean): MovableT?
 

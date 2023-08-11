@@ -76,6 +76,10 @@ internal class MovableCollection<MovableT: TypedMovable<ID, ContextT>, ID, Conte
         }
     }
 
+    fun <R> map(mapper: (MovableT) -> R): List<R> = lock.withLock {
+        movables.map(mapper)
+    }
+
     fun forEachReversed(action: (MovableT) -> Unit) {
         lock.withLock {
             val size = movables.size
