@@ -2,7 +2,7 @@ package lu.kremi151.desk.api
 
 import android.graphics.Canvas
 
-abstract class TypedMovable<ID, ContextT>(internal val id: ID) {
+abstract class TypedMovable<ID, ContextT: DeskViewContext>(internal val id: ID) {
 
     internal var bound = false
 

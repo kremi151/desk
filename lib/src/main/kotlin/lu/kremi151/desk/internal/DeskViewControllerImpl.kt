@@ -1,9 +1,10 @@
 package lu.kremi151.desk.internal
 
+import lu.kremi151.desk.api.DeskViewContext
 import lu.kremi151.desk.api.DeskViewController
 import lu.kremi151.desk.api.TypedMovable
 
-internal class DeskViewControllerImpl<MovableT : TypedMovable<ID, ContextT>, ID, ContextT>(
+internal class DeskViewControllerImpl<MovableT : TypedMovable<ID, ContextT>, ID, ContextT: DeskViewContext>(
     private val movables: MovableCollection<MovableT, ID, ContextT>,
 ): DeskViewController<MovableT, ID, ContextT> {
 

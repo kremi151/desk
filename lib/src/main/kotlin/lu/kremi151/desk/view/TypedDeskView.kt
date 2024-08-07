@@ -11,6 +11,7 @@ import android.view.ScaleGestureDetector
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import lu.kremi151.desk.R
+import lu.kremi151.desk.api.DeskViewContext
 import lu.kremi151.desk.api.DeskViewController
 import lu.kremi151.desk.api.DeskViewLayer
 import lu.kremi151.desk.api.DeskViewTouchHandler
@@ -25,7 +26,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 @Suppress("TooManyFunctions")
-open class TypedDeskView<MovableT : TypedMovable<ID, ContextT>, ID, ContextT> @JvmOverloads constructor(
+open class TypedDeskView<MovableT : TypedMovable<ID, ContextT>, ID, ContextT: DeskViewContext> @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
@@ -51,6 +52,13 @@ open class TypedDeskView<MovableT : TypedMovable<ID, ContextT>, ID, ContextT> @J
     var customContext: ContextT? = null
         set(value) {
             field = value
+
+            value?.let {
+                it.viewWidth = mWidth
+                it.viewHeight = mHeight
+                it.format = format
+            }
+
             movables.updateContexts()
         }
 
@@ -61,6 +69,7 @@ open class TypedDeskView<MovableT : TypedMovable<ID, ContextT>, ID, ContextT> @J
             }
             field = value
             thread?.format = format
+            customContext?.format = format
             invalidate()
         }
 
@@ -74,6 +83,11 @@ open class TypedDeskView<MovableT : TypedMovable<ID, ContextT>, ID, ContextT> @J
             mWidth = width
             mHeight = height
             thread?.surfaceSize = Size(width, height)
+
+            customContext?.apply {
+                viewWidth = width
+                viewHeight = height
+            }
 
             underlays.forEach { it.onSizeChanged(width, height) }
             overlays.forEach { it.onSizeChanged(width, height) }

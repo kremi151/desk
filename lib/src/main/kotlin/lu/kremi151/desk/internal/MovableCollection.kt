@@ -1,10 +1,11 @@
 package lu.kremi151.desk.internal
 
+import lu.kremi151.desk.api.DeskViewContext
 import lu.kremi151.desk.api.TypedMovable
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-internal class MovableCollection<MovableT: TypedMovable<ID, ContextT>, ID, ContextT>(
+internal class MovableCollection<MovableT: TypedMovable<ID, ContextT>, ID, ContextT: DeskViewContext>(
     private val getContext: () -> ContextT?,
 ) {
 
@@ -172,7 +173,7 @@ internal class MovableCollection<MovableT: TypedMovable<ID, ContextT>, ID, Conte
         }
     }
 
-    interface Listener<MovableT: TypedMovable<ID, ContextT>, ID, ContextT> {
+    interface Listener<MovableT: TypedMovable<ID, ContextT>, ID, ContextT: DeskViewContext> {
         fun onChanged(collection: MovableCollection<MovableT, ID, ContextT>)
     }
 

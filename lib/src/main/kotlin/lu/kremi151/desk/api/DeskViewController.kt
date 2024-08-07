@@ -1,6 +1,6 @@
 package lu.kremi151.desk.api
 
-interface DeskViewController<MovableT : TypedMovable<ID, ContextT>, ID, ContextT> {
+interface DeskViewController<MovableT : TypedMovable<ID, ContextT>, ID, ContextT: DeskViewContext> {
 
     fun addMovable(movable: MovableT)
 

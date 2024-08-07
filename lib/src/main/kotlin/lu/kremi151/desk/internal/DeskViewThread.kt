@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.util.Size
 import android.view.SurfaceHolder
 import lu.kremi151.desk.BuildConfig
+import lu.kremi151.desk.api.DeskViewContext
 import lu.kremi151.desk.api.DeskViewLayer
 import lu.kremi151.desk.api.Format
 import lu.kremi151.desk.api.TypedMovable
@@ -13,7 +14,7 @@ import lu.kremi151.desk.config.DeskViewConfig
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.Semaphore
 
-internal class DeskViewThread<MovableT : TypedMovable<ID, ContextT>, ID, ContextT>(
+internal class DeskViewThread<MovableT : TypedMovable<ID, ContextT>, ID, ContextT: DeskViewContext>(
     private val surfaceHolder: SurfaceHolder,
     private val movables: MovableCollection<MovableT, ID, ContextT>,
     private val underlays: CopyOnWriteArrayList<DeskViewLayer>,
