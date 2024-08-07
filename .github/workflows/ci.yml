@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: kremi151/android-ndk:android-31-jdk11
+      image: kremi151/android-ndk:android-34
     steps:
       - name: Pre-checkout
         run: apk add git
