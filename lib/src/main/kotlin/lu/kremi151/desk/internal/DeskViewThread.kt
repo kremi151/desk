@@ -3,11 +3,13 @@ package lu.kremi151.desk.internal
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.util.Log
 import android.util.Size
 import android.view.SurfaceHolder
 import lu.kremi151.desk.BuildConfig
 import lu.kremi151.desk.api.DeskViewContext
 import lu.kremi151.desk.api.DeskViewLayer
+import lu.kremi151.desk.api.DrawErrorHandling
 import lu.kremi151.desk.api.Format
 import lu.kremi151.desk.api.TypedMovable
 import lu.kremi151.desk.config.DeskViewConfig
@@ -105,11 +107,52 @@ internal class DeskViewThread<MovableT : TypedMovable<ID, ContextT>, ID, Context
                         toViewPixels(it.y + translation.y),
                     )
                     canvas.scale(scale, scale)
-                    it.draw(canvas)
+                    it.drawWithErrorHandling(canvas)
                     canvas.restore()
                 }
             }
         }
+    }
+
+    private fun MovableT.drawWithErrorHandling(canvas: Canvas) {
+        try {
+            draw(canvas)
+        } catch (e: Exception) {
+            reportDrawingError(this, e)
+            val handling = onDrawError(e)
+            applyErrorHandling(this, handling, canvas)
+        }
+    }
+
+    private fun applyErrorHandling(movableT: MovableT, handling: DrawErrorHandling, canvas: Canvas) {
+        when(handling) {
+            is DrawErrorHandling.Retry -> movableT.drawWithRetries(canvas, handling.attempts, handling.then)
+            is DrawErrorHandling.Ignore -> ignoreDrawError(handling.invalidate)
+        }
+    }
+
+    private fun MovableT.drawWithRetries(canvas: Canvas,
+                                         attempts: Int,
+                                         fallback: DrawErrorHandling) {
+        for (i in 1 until attempts) {
+            try {
+                draw(canvas)
+                return
+            } catch (e: Exception) {
+                reportDrawingError(this, e)
+            }
+        }
+        applyErrorHandling(this, fallback, canvas)
+    }
+
+    private fun ignoreDrawError(invalidateOnError: Boolean) {
+        if (invalidateOnError) {
+            s.release()
+        }
+    }
+
+    private fun reportDrawingError(movable: MovableT, e: Exception) {
+        Log.e(javaClass.simpleName, "Draw error for movable ${movable.id}", e)
     }
 
     private fun postDraw(canvas: Canvas) {

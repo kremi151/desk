@@ -112,4 +112,8 @@ abstract class TypedMovable<ID, ContextT: DeskViewContext>(internal val id: ID) 
         // No-op by default
     }
 
+    open fun onDrawError(e: Exception): DrawErrorHandling {
+        return DrawErrorHandling.Ignore()
+    }
+
 }
